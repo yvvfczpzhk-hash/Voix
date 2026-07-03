@@ -94,6 +94,7 @@
   }
   .consigne .lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted-2);font-weight:700}
   .consigne .txt{margin-top:5px;font-size:.97rem}
+  .focus-tag{margin-top:8px;font-size:.82rem;color:var(--accent);font-weight:600}
   .rec-tag{display:inline-flex;align-items:center;gap:6px;margin-top:9px;font-size:.78rem;color:var(--accent);font-weight:700}
 
   .spacer{flex:1;min-height:18px}
@@ -114,6 +115,13 @@
   }
   .cta-2:active{transform:scale(.98)}
   .cta-2:hover{background:var(--surface-2)}
+  .quick-lbl{margin:16px 0 8px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);text-align:center}
+  .quick-row{display:flex;gap:8px}
+  .quick{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border-radius:14px;
+    background:var(--surface);border:1px solid var(--border);color:var(--ink);font-size:1.15rem;transition:background .18s,transform .1s}
+  .quick span{font-size:.76rem;font-weight:700}
+  .quick:active{transform:scale(.96)}
+  .quick:hover{background:var(--surface-2)}
 
   /* ---------- session ---------- */
   .sess-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
@@ -177,6 +185,10 @@
   /* ---------- end / log ---------- */
   .done-h{font-family:var(--display);font-weight:800;font-size:2rem;text-align:center;margin:30px 0 4px}
   .done-sub{text-align:center;color:var(--muted);font-family:var(--mono);font-size:.85rem;margin-bottom:6px}
+  .done-top{text-align:center;color:var(--ink);font-size:.92rem;margin:4px 0}
+  .done-top b{color:#5fd08a}
+  .vfe-line{margin-top:8px;font-size:.85rem;color:var(--muted);text-align:center}
+  .vfe-line b{color:var(--ink)}
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-top:16px}
   .field{margin-top:16px}
   .field:first-child{margin-top:0}
@@ -295,6 +307,32 @@
   .phase-ctrl{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px auto 0;max-width:400px;flex-wrap:wrap}
   .drone-pill{font-weight:700}
   .drone-pill.on{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  .rate-row{display:flex;justify-content:center;gap:12px;margin:12px auto 0;max-width:340px}
+  .rate-btn{flex:1;max-width:150px;padding:11px 10px;border-radius:14px;border:1.5px solid var(--border);
+    background:var(--surface);color:var(--ink);font-weight:800;font-size:.95rem;cursor:pointer;transition:transform .08s ease}
+  .rate-btn:active{transform:scale(.96)}
+  .rate-btn.ok{border-color:#5fd08a;color:#5fd08a}
+  .rate-btn.ko{border-color:#e0685e;color:#e0685e}
+  .ex-record{margin:8px auto 0;text-align:center;font-family:var(--mono);font-size:.8rem;color:var(--muted-2)}
+  .chrono-row{display:flex;align-items:center;justify-content:center;gap:12px;margin:12px auto 0;max-width:340px}
+  .chrono-btn{padding:13px 22px;border-radius:14px;border:1.5px solid #C9A0E8;background:var(--surface);
+    color:#C9A0E8;font-weight:800;font-family:var(--mono);font-size:1rem;min-width:130px;transition:transform .08s}
+  .chrono-btn:active{transform:scale(.96)}
+  .chrono-btn.run{background:#C9A0E8;color:#170a24}
+  .chrono-best{font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+  .rec-row{display:flex;justify-content:center;gap:10px;margin:10px auto 0;max-width:340px}
+  .rec-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;border:1.5px solid var(--border);
+    background:var(--surface);color:var(--muted);font-weight:700;font-size:.82rem;transition:transform .08s}
+  .rec-btn:active{transform:scale(.96)}
+  .rec-btn.run{border-color:#e0685e;color:#e0685e;animation:recpulse 1.2s ease-in-out infinite}
+  .rec-btn.play{border-color:#5fd08a;color:#5fd08a}
+  @keyframes recpulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .cycle-opts{display:flex;align-items:center;gap:10px}
+  .cycle-opts button{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:1.1rem;font-weight:700}
+  .cyc-n{font-family:var(--mono);font-weight:700;min-width:22px;text-align:center}
+  .prep-lbl small{display:block;font-size:.68rem;color:var(--muted-2);font-weight:500}
+  .cycle-done{margin:12px auto 4px;text-align:center;font-weight:700}
+  .cycle-done .pill{margin-top:8px}
 
   /* « Comment faire ? » */
   .how-btn{display:block;margin:10px auto 0;padding:7px 15px;border-radius:999px;background:var(--surface);
@@ -348,10 +386,11 @@ const WEEKS = {
       obj:"Souffle, émission, justesse de base. On ne cherche pas l’aigu.",
       steps:[
         {t:"Souffle & appui", s:180, c:[`1) Réglage, SANS son : 4 respirations basses lentes — le ventre se gonfle à l’inspir, épaules immobiles`,`2) L’exercice (× 4-5) : inspire bas, PUIS expire sur un « sssss » long et régulier jusqu’à presque vide`,`1 inspiration = 1 « sssss ». Reprends une inspiration entre chaque · note ton meilleur temps`], tip:`Le filet d’air reste constant : ni faiblard, ni qui s’emballe.`,
-          ph:[{mode:"do",sec:40,label:"Réglage (sans son) — 4 respirations basses lentes : le ventre se gonfle, épaules immobiles"},{mode:"do",sec:140,label:"Inspire bas, puis « sssss » long et régulier jusqu’à presque vide — répète (1 inspiration = 1 sss)"}]},
+          ph:[{mode:"do",sec:40,label:"Appoggio : 4 respirations basses costo-diaphragmatiques — épaules immobiles, soutien bas"},{mode:"do",sec:140,label:"« sssss » d'appui : débit d'air constant, le plus long possible (1 inspiration = 1 sss)"}]},
         {t:"SOVT — paille & lip trills", s:300, c:[`Paille dans l’eau, glissandos doux grave↔aigu (2 min)`,`Lip trills « brrr » en glissando puis gamme 5 notes (2 min)`,`« ng » / « mmm » bouche fermée (1 min)`], tip:`Tout reste facile. Jamais forcer.`,
-          ph:[{mode:"do",sec:120,label:"Paille dans l’eau — glissandos doux grave↔aigu"},{mode:"do",sec:120,label:"Lip trills « brrr » en glissando, puis petite gamme 5 notes"},{mode:"do",sec:60,label:"« ng » / « mmm » bouche fermée"}]},
+          ph:[{mode:"siren",guide:[45,60],sec:120,label:"Paille dans l'eau — suis la sirène, contre-pression régulière"},{mode:"siren",guide:[43,62],sec:120,label:"Lip trills « brrr » — suis la sirène sur toute l'étendue"},{mode:"siren",guide:[48,60],sec:60,label:"« ng » fermé — suis la sirène, buzz à l'avant constant"}]},
         {t:"Attaques équilibrées", s:180, c:[`Note tenue 3-4 s sur « hé » puis « é » (retire le h)`,`Démarrage net et doux : ni soufflé, ni coup de glotte`,`Monte / descends par demi-tons`], tip:`Pense à un petit « ah ! » de surprise agréable.`},
+        {t:"Oreille — mémoire tonale", s:84, c:[`Une note jouée, 3 s de silence, tu la chantes de mémoire`,`Puis vérification au piano`], tip:`On ne chante juste que ce qu’on entend précisément.`},
         {t:"Justesse — note tenue (drone)", s:120, c:[`Tiens une seule note stable contre le bourdon`,`Accordeur allumé · 3-4 notes différentes`], tip:`L’exercice de vérité pour la stabilité de hauteur.`},
         {t:"Justesse — gamme 5 notes", s:120, c:[`do-ré-mi-fa-sol-fa-mi-ré-do sur « a », lentement`,`À l’accordeur · monte d’un demi-ton à chaque fois`]},
         {t:"Justesse — intervalles", s:120, c:[`do-mi puis do-sol (tierces, quintes), vérifiés au piano`,`Puis l’arpège do-mi-sol-do`]},
@@ -371,11 +410,14 @@ const WEEKS = {
       steps:[
         {t:"Souffle & appui", s:120, c:[`Inspire bas, puis expire sur un « sssss » long et régulier — à répéter 2-3 fois (1 inspiration = 1 sss)`]},
         {t:"SOVT — sirènes larges", s:240, c:[`Paille / lip trills en sirènes`,`Traverse TOUT ton registre, passe la zone de rupture sans t’arrêter`]},
+        {t:"Oreille — intervalles chantés", s:72, c:[`Le piano joue 2 notes : reproduis-les exactement`,`Tierces, quartes, quintes, sixtes, octave`], tip:`L’écart exact, pas juste « vers le haut ».`},
         {t:"Résonance — ng → a", s:90, c:[`Tiens le « ng », sens le buzz à l’avant`,`Ouvre vers « a » en gardant le buzz · monte par demi-tons`]},
         {t:"Résonance — nay nay nay", s:90, c:[`« nay nay nay » brillant en arpège do-mi-sol-do`,`Cherche la brillance qui « coupe »`]},
         {t:"Passaggio — goug / mum", s:180, c:[`« goug » ou « mum » sur arpège do-mi-sol-do-sol-mi-do`,`Lip trill d’abord si ça craque, puis voyelle`,`Monte progressivement dans ta zone de passage`], tip:`La consonne fermée garde les cordes connectées.`},
         {t:"Passaggio — sirènes ng", s:120, c:[`Sirènes sur « ng » à travers le break`,`Lentement, sans craquer`]},
         {t:"Modification de voyelle", s:60, c:[`Sur une note haute : « i » → « é », « a » → « o »`,`Sens la tension qui se désamorce`]},
+        {t:"Voyelles — égalisation", s:120, c:[`i-é-a-o-ou enchaînées sur la même note`,`Même placement, même volume — la voyelle change dans la bouche, pas dans la gorge`]},
+        {t:"Legato — ligne", s:120, c:[`Gamme lente sur « ou » pur`,`Le son ne s’interrompt JAMAIS entre les notes — comme un archet`]},
         {t:"Application répertoire", s:180, c:[`Un passage de ta chanson qui monte (zone de passage)`,`Applique le mix + la modif de voyelle`]},
         {t:"Retour au calme", s:60, c:[`Fredonnement doux descendant`,`Relâche la mâchoire`]},
       ],
@@ -392,11 +434,13 @@ const WEEKS = {
       obj:"Agilité, nuances, répertoire. Là, ça sonne.",
       steps:[
         {t:"Échauffement express", s:240, c:[`« sssss » + paille / lip trills en sirènes`,`1 min de « ng → a »`], tip:`Tu condenses tout l’acquis des 2 semaines.`,
-          ph:[{mode:"do",sec:180,label:"« sssss » d’appui, puis paille / lip trills en sirènes sur toute l’étendue"},{mode:"do",sec:60,label:"« ng → a » : tiens le buzz puis ouvre, en montant doucement"}]},
+          ph:[{mode:"siren",guide:[43,62],sec:120,label:"Paille / lip trills en sirènes — réveille l'émission sur toute l'étendue"},{mode:"do",sec:60,label:"« ng → a » : buzz à l'avant puis ouvre, en montant par demi-tons"},{mode:"do",sec:60,label:"Quelques attaques « é » nettes dans le médium-aigu"}]},
+        {t:"Oreille — intonation battements", s:90, c:[`Le bourdon tient la fondamentale`,`Chante tierce, quinte, octave : quand c’est parfaitement juste, les battements disparaissent`], tip:`L’intonation des choristes professionnels.`},
         {t:"Agilité — gammes rapides", s:120, c:[`Gammes rapides sur « a », métronome`,`Lent (« ha-ha-ha ») → legato → accélère d’un cran`]},
         {t:"Agilité — staccato", s:90, c:[`Notes piquées détachées sur arpège do-mi-sol-do`,`Légères et nettes`]},
         {t:"Agilité — mélisme", s:90, c:[`Un petit mélisme de ta chanson`,`Lent puis à tempo`]},
         {t:"Nuances — messa di voce", s:240, c:[`Sur une note tenue : crescendo (doux→fort) puis decrescendo (fort→doux)`,`Hauteur et timbre stables · accordeur allumé · 4-5 notes`], tip:`C’est dur — quelques-unes suffisent.`},
+        {t:"Vibrato — libération", s:120, c:[`Son droit appuyé 5-6 s, puis relâche`,`Laisse le vibrato s’installer seul (5-6 ondulations/s) — ne le fabrique pas`]},
         {t:"Application répertoire", s:360, c:[`Une chanson entière (ou une grande section)`,`Intègre tout : appui, attaque, mix, ring, nuances`,`AVEC le texte et l’intention`]},
         {t:"Retour au calme", s:60, c:[`Fredonnement doux descendant`,`Relâche la mâchoire`]},
       ],
@@ -411,6 +455,20 @@ const WEEKS = {
       }},
 };
 const REC_DAYS = [3,7];
+// Un seul point d'attention par séance — principe pédagogique clé
+const FOCUS=[
+  "le souffle porte tout — le son se pose dessus",
+  "zéro tension de mâchoire, elle pend, libre",
+  "la voyelle reste pure du début à la fin de la note",
+  "vise la note par au-dessus, jamais par en dessous",
+  "le volume vient de la résonance, pas de la poussée",
+  "chaque attaque est décidée AVANT d'inspirer",
+  "larynx posé, stable, même en montant",
+  "écoute-toi comme si c'était quelqu'un d'autre",
+  "legato : le son ne s'interrompt jamais entre les notes",
+  "la fin de note est aussi soignée que le début",
+];
+function todayFocus(){ const d=new Date(); const n=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5); return FOCUS[n%FOCUS.length]; }
 const REST_DAYS = [6];
 
 const OFF = { theme:"Jour OFF", accent:"#6FB3A8", ink:"#0a1f1c",
@@ -421,23 +479,46 @@ const OFF = { theme:"Jour OFF", accent:"#6FB3A8", ink:"#0a1f1c",
     {t:"Sirènes légères", s:180, c:[`Sirènes douces sur « ng »`,`Laisse revenir l’émission, sans forcer`], tip:`On ne force jamais pour débloquer.`},
   ]};
 
+/* MODES RAPIDES */
+const VFE = { theme:"VFE", accent:"#C9A0E8", ink:"#170a24",
+  obj:"Vocal Function Exercises (Stemple) — le protocole le plus validé. Doux, précis, 2×/jour idéalement.",
+  steps:[
+    {t:"VFE 1 — Tenue maximale « i »", s:63, c:[`Note confortable, « i » doux et clair`,`Le plus longtemps possible — chronomètre-toi (2 essais)`]},
+    {t:"VFE 2 — Glissé grave → aigu", s:45, c:[`« knoll » ou lip trill, du plus grave au plus aigu`,`Sans trou, sans cassure`]},
+    {t:"VFE 3 — Glissé aigu → grave", s:45, c:[`Du plus aigu au plus grave`,`Descends sans décrocher`]},
+    {t:"VFE 4 — Cinq tenues maximales", s:240, c:[`Do-Ré-Mi-Fa-Sol du médium, sur « ol »`,`Chaque note tenue au maximum, chronométrée`]},
+  ]};
+const STAGE = { theme:"Express", accent:"#F0B72E", ink:"#241a00",
+  obj:"Avant de chanter : 6 minutes pour réveiller l’émission, la brillance et la justesse.",
+  steps:[
+    {t:"Réveil — sirènes", s:90, c:[`Paille ou lip trills en sirènes`,`Réveille toute l’étendue, sans forcer`]},
+    {t:"Résonance — nay nay nay", s:60, c:[`« nay » brillant en arpège`,`Réveille le squillo`]},
+    {t:"Attaques équilibrées", s:60, c:[`Onsets nets sur « é »`,`Ni soufflé, ni dur`]},
+    {t:"Justesse — gamme 5 notes", s:100, c:[`Gammes appel-réponse`,`Cale l’oreille et la voix`]},
+  ]};
+
 /* =========================================================
-   STOCKAGE (window.storage prioritaire, repli mémoire)
+   STOCKAGE — 3 étages : window.storage (artifact Claude)
+   → localStorage (site hébergé, ex. GitHub Pages) → mémoire.
+   Chaque étage est sondé dans un try/catch : aucun ne peut planter l'app.
    ========================================================= */
 const _mem = {};
+const _ls = (()=>{ try{ const t="voix:__t"; localStorage.setItem(t,"1"); localStorage.removeItem(t); return localStorage; }catch(e){ return null; } })();
 const Store = {
   async get(k){
     try{ if(window.storage&&window.storage.get){ const r=await window.storage.get(k); return r?r.value:null; } }catch(e){}
+    if(_ls){ try{ const v=_ls.getItem(k); if(v!=null) return v; }catch(e){} }
     return (k in _mem)?_mem[k]:null;
   },
   async set(k,v){
-    try{ if(window.storage&&window.storage.set){ await window.storage.set(k,v); _mem[k]=v; return; } }catch(e){}
     _mem[k]=v;
+    if(_ls){ try{ _ls.setItem(k,v); }catch(e){} }
+    try{ if(window.storage&&window.storage.set){ await window.storage.set(k,v); } }catch(e){}
   },
   async getJSON(k,fb){ const v=await this.get(k); if(v==null) return fb; try{return JSON.parse(v);}catch(e){return fb;} },
   async setJSON(k,o){ await this.set(k,JSON.stringify(o)); },
 };
-const K_LOGS="voix:logs:v1", K_PREFS="voix:prefs:v1";
+const K_LOGS="voix:logs:v1", K_PREFS="voix:prefs:v1", K_TOPS="voix:tops:v1";
 
 /* =========================================================
    AUDIO — petits bips Web Audio
@@ -474,8 +555,8 @@ if(REDUCE) document.documentElement.classList.add("reduce");
 
 const S = {
   screen:"home", week:1, day:1, mode:"week",
-  steps:[], idx:0, phases:[], pidx:0, tr:0, phase:"prep", prepMs:0, prepSecs:5, remMs:0, running:false, endAt:0,
-  muted:false, goal:30, logs:[], _celebrate:null,
+  steps:[], idx:0, phases:[], pidx:0, tr:0, trAuto:0, phase:"prep", prepMs:0, prepSecs:5, remMs:0, running:false, endAt:0,
+  muted:false, goal:30, logs:[], _celebrate:null, level:"std", cycle:1, tops:{}, sessTop:null, vfeHolds:[],
   form:{sssss:20, sens:4, note:""},
 };
 const app=document.getElementById("app");
@@ -541,12 +622,30 @@ function renderHome(){
     <div class="consigne">
       <div class="lbl">Consigne du jour</div>
       <div class="txt">${esc(wk.days[S.day])}</div>
+      <div class="focus-tag">🎯 Focus : ${esc(todayFocus())}</div>
       ${isRec?`<div class="rec-tag">🎙 Pense à t’enregistrer aujourd’hui</div>`:""}
     </div>
 
     <div class="meta-line">
       <span>≈ ${Math.round(dur/60)} min · ${wk.steps.length} étapes</span>
       ${hasTodayLog()?`<span class="today-done">✓ séance faite aujourd’hui</span>`:""}
+    </div>
+
+    <div class="prep-row">
+      <span class="prep-lbl">🎚 Niveau</span>
+      <div class="prep-opts" id="lvlOpts">
+        <button data-l="std" class="${S.level!=="adv"?'on':''}">Confirmé</button>
+        <button data-l="adv" class="${S.level==="adv"?'on':''}">Avancé</button>
+      </div>
+    </div>
+
+    <div class="prep-row">
+      <span class="prep-lbl">🔁 Cycle <small>(chaque cycle démarre plus haut, plus vite)</small></span>
+      <div class="prep-opts cycle-opts">
+        <button id="cycDown" aria-label="Cycle précédent">–</button>
+        <span class="cyc-n">${S.cycle}</span>
+        <button id="cycUp" aria-label="Cycle suivant">+</button>
+      </div>
     </div>
 
     <div class="prep-row">
@@ -559,13 +658,23 @@ function renderHome(){
     <div class="spacer"></div>
     <button class="cta" id="start">Commencer la séance</button>
     <button class="cta-2" id="startOff">🌙 Jour OFF — « ça ne sort pas »</button>
+    <div class="quick-lbl">Modes rapides</div>
+    <div class="quick-row">
+      <button class="quick" id="startVfe">🔬<span>VFE</span></button>
+      <button class="quick" id="startStage">🎭<span>Express</span></button>
+    </div>
   `;
 
-  app.querySelectorAll(".week").forEach(b=>b.onclick=()=>{ S.week=+b.dataset.week; savePos(); renderHome(); });
-  app.querySelectorAll(".day").forEach(b=>b.onclick=()=>{ S.day=+b.dataset.day; savePos(); renderHome(); });
-  app.querySelectorAll("#prepOpts button").forEach(b=>b.onclick=()=>{ S.prepSecs=+b.dataset.p; savePos(); renderHome(); });
+  app.querySelectorAll(".week").forEach(b=>b.onclick=()=>{ S.week=+b.dataset.week; savePrefs(); renderHome(); });
+  app.querySelectorAll(".day").forEach(b=>b.onclick=()=>{ S.day=+b.dataset.day; savePrefs(); renderHome(); });
+  app.querySelectorAll("#prepOpts button").forEach(b=>b.onclick=()=>{ S.prepSecs=+b.dataset.p; savePrefs(); renderHome(); });
+  app.querySelectorAll("#lvlOpts button").forEach(b=>b.onclick=()=>{ S.level=b.dataset.l; savePrefs(); renderHome(); });
+  app.querySelector("#cycDown").onclick=()=>{ S.cycle=Math.max(1,S.cycle-1); savePrefs(); renderHome(); };
+  app.querySelector("#cycUp").onclick=()=>{ S.cycle=Math.min(9,S.cycle+1); savePrefs(); renderHome(); };
   app.querySelector("#start").onclick=()=>startSession("week");
   app.querySelector("#startOff").onclick=()=>startSession("off");
+  app.querySelector("#startVfe").onclick=()=>startSession("vfe");
+  app.querySelector("#startStage").onclick=()=>startSession("stage");
   app.querySelector("#goProg").onclick=()=>renderProgress();
   app.querySelector("#openToolsTop").onclick=openTools;
   refreshToolsTriggers();
@@ -574,13 +683,15 @@ function renderHome(){
 /* =========================================================
    SESSION — moteur + écran
    ========================================================= */
+function modeSrc(m){ return m==="off"?OFF : m==="vfe"?VFE : m==="stage"?STAGE : WEEKS[S.week]; }
+function modeLabel(){ return S.mode==="off"?"Jour OFF" : S.mode==="vfe"?"VFE" : S.mode==="stage"?"Express scène" : ("S"+S.week+" · J"+S.day); }
 function startSession(mode){
   audio(); // débloque l'audio sur le geste utilisateur
   S.mode=mode;
-  const src = mode==="off" ? OFF : WEEKS[S.week];
+  const src = modeSrc(mode);
   setAccent(src.accent,src.ink);
   S.steps=src.steps; S.running=true; S.screen="session";
-  S.idx=0; S.tr=0; S.phases=buildPhases(S.steps[0]); S.pidx=0;
+  S.idx=0; S.tr=0; S.trAuto=0; S.sessTop=null; S.vfeHolds=[]; S.phases=buildPhases(S.steps[0]); S.pidx=0;
   S.phase="prep"; S.prepMs=S.prepSecs*1000; S.remMs=S.phases[0].sec*1000;
   S.endAt=Date.now()+S.prepMs;
   renderSession();
@@ -596,6 +707,7 @@ function stopTick(){ if(tick){ clearInterval(tick); tick=null; } }
 function onTick(){
   if(!S.running) return;
   const left = S.endAt - Date.now();
+  if(CH.on){ const b=document.getElementById("chronoBtn"); if(b) b.textContent="⏹ "+((performance.now()-CH.t0)/1000).toFixed(1)+" s"; }
   if(S.phase==="prep"){ S.prepMs=left; if(left<=0){ beginRun(); return; } }
   else { S.remMs=left; if(left<=0){ nextPhase(true); return; } }
   paintTimer();
@@ -603,17 +715,17 @@ function onTick(){
 
 // Entre dans un EXERCICE : d'abord un court temps de lecture (prep), puis ses phases
 function enterStep(i){
-  stopModel(); stopHold();
-  S.idx=i; S.tr=0; S.phases=buildPhases(S.steps[i]); S.pidx=0;
+  stopModel(); stopHold(); stopSiren();
+  S.idx=i; S.tr=0; S.trAuto=0; S.phases=buildPhases(S.steps[i]); S.pidx=0;
   S.phase="prep"; S.prepMs=S.prepSecs*1000; S.remMs=S.phases[0].sec*1000;
   if(S.running) S.endAt=Date.now()+S.prepMs;
-  paintStep(); paintPhase(); paintTimer(); paintPlay(); paintControls();
+  paintStep(); paintPhase(); paintTimer(); paintPlay(); paintControls(); paintRate(); paintChrono(); paintRec();
   announce("Exercice "+(i+1)+" : "+S.steps[i].t);
 }
 function beginRun(){ enterPhase(0); } // fin du temps de lecture → 1re phase
 // Entre dans une PHASE (écoute / à toi / fais) et déclenche son audio
 function enterPhase(j){
-  stopModel(); stopHold();
+  stopModel(); stopHold(); stopSiren();
   S.pidx=j; S.phase="run";
   const ph=S.phases[j];
   S.remMs=ph.sec*1000;
@@ -621,10 +733,11 @@ function enterPhase(j){
   phaseCue(ph.mode);
   if(ph.mode==="listen"){ playPhaseModel(ph.play); }
   else if(ph.mode==="sing"){
-    if(ph.sustain){ startHold((ph.note||48)+S.tr, ph.sec); }
-    else if(ph.ref){ setTimeout(()=>{ if(S.running&&S.phase==="run"&&S.pidx===j) playNoteRef((ph.note||48)+S.tr); }, 150); }
+    if(ph.sustain){ startHold((ph.note||48)+totTr(), ph.sec); }
+    else if(ph.ref){ setTimeout(()=>{ if(S.running&&S.phase==="run"&&S.pidx===j) playNoteRef((ph.note||48)+totTr()); }, 150); }
   }
-  paintPhase(); paintTimer(); paintPlay(); paintControls();
+  else if(ph.mode==="siren"){ const gd=ph.guide||[45,57]; startSiren(gd[0]+totTr(), gd[1]+totTr(), ph.sec, ph.dir); }
+  paintPhase(); paintTimer(); paintPlay(); paintControls(); paintRate(); paintChrono(); paintRec();
   announce(phaseAnnounce(ph));
 }
 function startNow(){ // sauter l'attente de lecture
@@ -652,14 +765,31 @@ function navPrev(){
 function togglePause(){
   S.running=!S.running;
   const key = S.phase==="prep" ? "prepMs" : "remMs";
-  if(S.running){ S.endAt=Date.now()+S[key]; startTick(); lockScreen(); }
-  else { S[key]=Math.max(0,S.endAt-Date.now()); stopTick(); stopModel(); stopHold(); }
+  if(S.running){ S.endAt=Date.now()+S[key]; startTick(); lockScreen(); if(S.phase==="run") resumePhaseAudio(); }
+  else { S[key]=Math.max(0,S.endAt-Date.now()); stopTick(); stopModel(); stopHold(); stopSiren(); }
   paintPlay(); paintPhase();
 }
-function addTime(sec){ S.remMs+=sec*1000; if(S.running && S.phase==="run") S.endAt=Date.now()+S.remMs; paintTimer(); }
+// Relance le son adapté à la phase courante (après pause, unmute, +30s, transposition)
+function resumePhaseAudio(){
+  if(S.muted || S.phase!=="run") return;
+  const ph=curPhase();
+  const left=Math.max(1,Math.round((S.endAt-Date.now())/1000)||ph.sec);
+  if(ph.mode==="listen"){ playPhaseModel(ph.play); }
+  else if(ph.mode==="siren"){ const gd=ph.guide||[45,57]; startSiren(gd[0]+totTr(), gd[1]+totTr(), left, ph.dir); }
+  else if(ph.mode==="sing" && ph.sustain){ startHold((ph.note||48)+totTr(), left); }
+}
+function addTime(sec){
+  S.remMs+=sec*1000;
+  if(S.running && S.phase==="run"){
+    S.endAt=Date.now()+S.remMs;
+    const m=curPhase().mode;
+    if(m==="siren"||(m==="sing"&&curPhase().sustain)) resumePhaseAudio(); // prolonge le guide continu
+  }
+  paintTimer();
+}
 
 function endSession(){
-  stopTick(); stopModel(); stopHold(); unlockScreen(); chimeEnd();
+  stopTick(); stopModel(); stopHold(); stopSiren(); recCleanup(); unlockScreen(); chimeEnd();
   S.running=false; S.screen="end";
   S.form={ sssss:(S.logs[0]?S.logs[0].sssss:20), sens:4, note:"" };
   renderEnd();
@@ -668,9 +798,9 @@ function endSession(){
 const R=110, CIRC=2*Math.PI*R;
 function renderSession(){
   const step=S.steps[S.idx];
-  const label = S.mode==="off" ? "Jour OFF" : ("S"+S.week+" · J"+S.day);
-  const consigne = S.mode==="off" ? OFF.obj : WEEKS[S.week].days[S.day];
-  const isRec = S.mode!=="off" && REC_DAYS.includes(S.day);
+  const label = modeLabel();
+  const consigne = S.mode==="week" ? WEEKS[S.week].days[S.day] : modeSrc(S.mode).obj;
+  const isRec = S.mode==="week" && REC_DAYS.includes(S.day);
 
   app.className="fade";
   app.innerHTML=`
@@ -709,6 +839,19 @@ function renderSession(){
       </div>
       <button class="pill drone-pill" id="phaseDrone">🎵 Bourdon</button>
     </div>
+    <div class="rate-row" id="rateRow" style="display:none">
+      <button class="rate-btn ok" id="rateOk">✓ Propre</button>
+      <button class="rate-btn ko" id="rateKo">✗ Forcé</button>
+    </div>
+    <div class="rec-row" id="recRow" style="display:none">
+      <button class="rec-btn" id="recBtn">⏺ M’enregistrer</button>
+      <button class="rec-btn play" id="recPlay" style="display:none">▶ Moi</button>
+    </div>
+    <div class="chrono-row" id="chronoRow" style="display:none">
+      <button class="chrono-btn" id="chronoBtn">⏱ Départ</button>
+      <span class="chrono-best" id="chronoBest"></span>
+    </div>
+    <div class="ex-record" id="exRecord" style="display:none"></div>
 
     <ul class="cues" id="cues"></ul>
     <p class="tip" id="tip"></p>
@@ -729,7 +872,7 @@ function renderSession(){
       </div>
     </div>
   `;
-  app.querySelector("#quit").onclick=()=>{ stopTick(); stopModel(); stopHold(); unlockScreen(); renderHome(); };
+  app.querySelector("#quit").onclick=()=>{ stopTick(); stopModel(); stopHold(); stopSiren(); recCleanup(); unlockScreen(); renderHome(); };
   app.querySelector("#prev").onclick=navPrev;
   app.querySelector("#next").onclick=navNext;
   app.querySelector("#play").onclick=onCentral;
@@ -740,10 +883,15 @@ function renderSession(){
   app.querySelector("#phaseDown").onclick=()=>shiftPhase(-1);
   app.querySelector("#phaseUp").onclick=()=>shiftPhase(1);
   app.querySelector("#phaseDrone").onclick=toggleExerciseDrone;
+  app.querySelector("#rateOk").onclick=()=>rateRound(true);
+  app.querySelector("#rateKo").onclick=()=>rateRound(false);
+  app.querySelector("#chronoBtn").onclick=chronoToggle;
+  app.querySelector("#recBtn").onclick=recToggle;
+  app.querySelector("#recPlay").onclick=recPlayback;
   app.querySelector("#howBtn").onclick=()=>openHow(S.steps[S.idx].t);
 
   buildSegs();
-  paintStep(); paintPhase(); paintTimer(); paintPlay(); paintControls(); paintMute();
+  paintStep(); paintPhase(); paintTimer(); paintPlay(); paintControls(); paintRate(); paintChrono(); paintRec(); paintMute();
   refreshToolsTriggers();
 }
 
@@ -767,14 +915,15 @@ function paintStep(){
 }
 const MODES={
   listen:{txt:"🔊 ÉCOUTE LE MODÈLE", col:"#7FB2F0"},
-  sing:{txt:"🎶 À TOI · reproduis",  col:"#5fd08a"},
-  do:{txt:"▶ FAIS L’EXERCICE",       col:"var(--accent)"},
+  sing:{txt:"🎙 À TOI · reproduis",   col:"#5fd08a"},
+  siren:{txt:"🌀 SUIS LA SIRÈNE",     col:"#C9A0E8"},
+  do:{txt:"▶ EXERCICE",               col:"var(--accent)"},
 };
 function curPhase(){ return S.phases[S.pidx]||{mode:"do",sec:1,label:""}; }
 function phaseRootMidi(){
   const ph=curPhase();
-  const r=(ph.note!=null)?ph.note:(ph.play&&ph.play.root!=null?ph.play.root:(ph.play&&ph.play.gliss?ph.play.gliss[0]:48));
-  return r+(S.tr||0);
+  const r=(ph.note!=null)?ph.note:(ph.guide?ph.guide[0]:(ph.play&&ph.play.root!=null?ph.play.root:48));
+  return r+totTr();
 }
 function paintTimer(){
   const t=document.getElementById("time"); if(!t) return;
@@ -822,14 +971,108 @@ function paintPhase(){
 function paintControls(){
   const bar=document.getElementById("phaseCtrl"); if(!bar) return;
   const ph=curPhase();
-  const hasModel = S.phase==="run" && ph.play && (ph.play.pat||ph.play.note!=null||ph.play.gliss);
+  const hasModel = S.phase==="run" && (ph.mode==="siren" || (ph.play && (ph.play.pat||ph.play.note!=null)));
   bar.style.display = hasModel ? "flex" : "none";
   if(!hasModel) return;
   const rootEl=document.getElementById("phaseRoot"); if(rootEl) rootEl.textContent=midiName(phaseRootMidi());
   const db=document.getElementById("phaseDrone"); if(db) db.classList.toggle("on",T.drone.on);
+  const rp=document.getElementById("phaseReplay"); if(rp) rp.firstChild&&(rp.textContent = ph.mode==="siren" ? "▶ Relancer" : "▶ Rejouer");
 }
-function replayPhase(){ const ph=curPhase(); if(ph.play) playPhaseModel(ph.play); }
-function shiftPhase(d){ S.tr=Math.max(-12,Math.min(24,(S.tr||0)+d)); paintControls(); if(T.drone.on){ T.drone.semi=phaseRootMidi()-57; droneSetFreq(); updateDroneUI(); } }
+function paintRate(){
+  const rr=document.getElementById("rateRow");
+  if(rr) rr.style.display = (S.phase==="run" && curPhase().mode==="sing") ? "flex" : "none";
+  const er=document.getElementById("exRecord");
+  if(er){
+    const top=S.tops[S.steps[S.idx].t];
+    if(top!=null && S.phase==="run" && (curPhase().mode==="sing"||curPhase().mode==="listen")){ er.style.display="block"; er.textContent="🏔 Record validé : "+midiName(top); }
+    else er.style.display="none";
+  }
+}
+function replayPhase(){
+  const ph=curPhase();
+  if(ph.mode==="siren"){ const gd=ph.guide||[45,57]; const left=Math.max(4,Math.round((S.endAt-Date.now())/1000)||ph.sec); startSiren(gd[0]+totTr(), gd[1]+totTr(), left, ph.dir); return; }
+  if(ph.play) playPhaseModel(ph.play);
+}
+function shiftPhase(d){
+  S.tr=Math.max(-12,Math.min(24,(S.tr||0)+d)); paintControls();
+  const ph=curPhase();
+  if(ph.mode==="sing" && ph.sustain && holdNodes){ // retune le guide tenu, sans coupure
+    const f=midiToFreq((ph.note||48)+totTr()); const c=audio();
+    try{ holdNodes.o.frequency.setTargetAtTime(f,c.currentTime,.05); holdNodes.o2.frequency.setTargetAtTime(f,c.currentTime,.05); }catch(e){}
+  } else if(ph.mode==="siren" && sirenNodes){ resumePhaseAudio(); } // relance la sirène sur la nouvelle plage
+  if(T.drone.on){ T.drone.semi=phaseRootMidi()-57; droneSetFreq(); updateDroneUI(); }
+}
+function totTr(){ return (S.tr||0)+(S.trAuto||0); }
+// Feedback adaptatif : ✓ propre → on continue de monter (et record) ; ✗ forcé → le round suivant REDESCEND
+function rateRound(ok){
+  const ph=curPhase(); if(ph.mode!=="sing") return;
+  const sung=(ph.note||48)+totTr();
+  if(ok){
+    if(S.sessTop==null||sung>S.sessTop) S.sessTop=sung;
+    const t=S.steps[S.idx].t;
+    if(S.tops[t]==null||sung>S.tops[t]){ S.tops[t]=sung; saveTops(); }
+  } else {
+    S.trAuto-=2; // le prochain round pré-généré (+1) sonnera 1 demi-ton PLUS BAS
+  }
+  nextPhase(false);
+}
+async function saveTops(){ await Store.setJSON(K_TOPS,S.tops); }
+/* Chrono VFE : tap départ / tap stop — mesure la tenue maximale */
+const CH={on:false,t0:0};
+function chronoToggle(){
+  const btn=document.getElementById("chronoBtn"); if(!btn) return;
+  if(!CH.on){ CH.on=true; CH.t0=performance.now(); btn.classList.add("run"); btn.textContent="⏹ 0.0 s"; }
+  else{
+    CH.on=false; btn.classList.remove("run");
+    const d=(performance.now()-CH.t0)/1000;
+    if(d>=1){ S.vfeHolds.push(d); const bb=document.getElementById("chronoBest"); if(bb) bb.textContent="✓ "+d.toFixed(1)+" s — record séance "+Math.max(...S.vfeHolds).toFixed(1)+" s"; }
+    btn.textContent="⏱ Départ";
+  }
+}
+/* MIROIR : enregistre ta reproduction, réécoute (A/B avec ▶ Rejouer = le modèle).
+   Aucune analyse — le micro sert uniquement de magnétophone. */
+const REC={rec:null, stream:null, on:false, url:null, audio:null, chunks:[]};
+async function recToggle(){
+  const btn=document.getElementById("recBtn"); if(!btn) return;
+  if(REC.on){ try{ REC.rec.stop(); }catch(e){} return; }
+  try{
+    REC.stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    REC.chunks=[];
+    REC.rec=new MediaRecorder(REC.stream);
+    REC.rec.ondataavailable=e=>{ if(e.data&&e.data.size) REC.chunks.push(e.data); };
+    REC.rec.onstop=()=>{
+      REC.on=false;
+      try{ REC.stream.getTracks().forEach(t=>t.stop()); }catch(e){}
+      if(REC.url) URL.revokeObjectURL(REC.url);
+      REC.url=URL.createObjectURL(new Blob(REC.chunks));
+      btn.classList.remove("run"); btn.textContent="⏺ M’enregistrer";
+      const p=document.getElementById("recPlay"); if(p) p.style.display="inline-flex";
+    };
+    REC.rec.start(); REC.on=true;
+    btn.classList.add("run"); btn.textContent="⏹ Stop";
+  }catch(e){ btn.textContent="🎤 micro refusé"; setTimeout(()=>{ btn.textContent="⏺ M’enregistrer"; },2500); }
+}
+function recPlayback(){
+  if(!REC.url) return;
+  if(REC.audio){ try{ REC.audio.pause(); }catch(e){} }
+  REC.audio=new Audio(REC.url); REC.audio.play();
+}
+function recCleanup(){
+  if(REC.on){ try{ REC.rec.stop(); }catch(e){} }
+  if(REC.audio){ try{ REC.audio.pause(); }catch(e){} REC.audio=null; }
+  if(REC.url){ URL.revokeObjectURL(REC.url); REC.url=null; }
+  const p=document.getElementById("recPlay"); if(p) p.style.display="none";
+}
+function paintRec(){
+  const row=document.getElementById("recRow"); if(!row) return;
+  row.style.display=(S.phase==="run" && curPhase().mode==="sing")?"flex":"none";
+}
+function paintChrono(){
+  const row=document.getElementById("chronoRow"); if(!row) return;
+  const show=S.phase==="run" && !!curPhase().chrono;
+  row.style.display=show?"flex":"none";
+  if(!show && CH.on){ CH.on=false; const b=document.getElementById("chronoBtn"); if(b){ b.classList.remove("run"); b.textContent="⏱ Départ"; } }
+}
 function toggleExerciseDrone(){
   audio();
   if(T.drone.on){ T.drone.on=false; T.drone.follow=false; droneStop(); }
@@ -848,7 +1091,11 @@ function paintPlay(){
     ? `<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>`
     : `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
 }
-function toggleMute(){ S.muted=!S.muted; savePrefs(); paintMute(); }
+function toggleMute(){
+  S.muted=!S.muted; savePrefs(); paintMute();
+  if(S.muted){ stopModel(); stopHold(); stopSiren(); if(T.drone.on){ T.drone.on=false; T.drone.follow=false; droneStop(); updateDroneUI(); refreshToolsTriggers(); paintControls(); } }
+  else if(S.running) resumePhaseAudio();
+}
 function paintMute(){
   const m=document.getElementById("mute"); if(!m) return;
   m.classList.toggle("on",!S.muted);
@@ -861,13 +1108,15 @@ function paintMute(){
    ÉCRAN — FIN / SUIVI
    ========================================================= */
 function renderEnd(){
-  const label = S.mode==="off" ? "Jour OFF" : ("S"+S.week+" · J"+S.day);
+  const label = modeLabel();
   const dur = S.steps.reduce((a,s)=>a+S.prepSecs+exDurMs(s)/1000,0);
   app.className="fade";
   app.innerHTML=`
     <h1 class="done-h">Séance terminée</h1>
     <div class="done-sub">${label} · ${Math.round(dur/60)} min</div>
-    ${""}
+    ${S.sessTop!=null?`<div class="done-top">🏔 Sommet validé aujourd’hui : <b>${midiName(S.sessTop)}</b></div>`:""}
+    ${S.vfeHolds.length?`<div class="done-top">⏱ Meilleure tenue VFE : <b>${Math.max(...S.vfeHolds).toFixed(1)} s</b></div>`:""}
+    ${(S.mode==="week"&&S.week===3&&S.day===7)?`<div class="cycle-done">🎉 Cycle ${S.cycle} terminé ! <button class="pill on" id="nextCycle">Démarrer le cycle ${S.cycle+1} →</button></div>`:""}
 
     <div class="card">
       <div class="field">
@@ -901,11 +1150,13 @@ function renderEnd(){
     app.querySelectorAll(".star").forEach(s=>s.classList.toggle("on",+s.dataset.n<=S.form.sens));
   });
   app.querySelector("#note").oninput=e=>S.form.note=e.target.value;
+  const nc=app.querySelector("#nextCycle");
+  if(nc) nc.onclick=()=>{ S.cycle=Math.min(9,S.cycle+1); S.week=1; S.day=1; savePrefs(); renderHome(); };
   app.querySelector("#save").onclick=async()=>{
     const prevBest=S.logs.reduce((m,l)=>Math.max(m,l.sssss||0),0);
     S.logs.unshift({ date:todayKey(), ts:Date.now(),
-      mode:S.mode, week:S.mode==="off"?null:S.week, day:S.mode==="off"?null:S.day,
-      sssss:S.form.sssss, sens:S.form.sens, note:(S.form.note||"").trim() });
+      mode:S.mode, week:S.mode==="week"?S.week:null, day:S.mode==="week"?S.day:null,
+      sssss:S.form.sssss, sens:S.form.sens, note:(S.form.note||"").trim(), top:S.sessTop??null, vfeBest:(S.vfeHolds.length?Math.max(...S.vfeHolds):null) });
     if(S.logs.length>400) S.logs.length=400;
     const v=S.form.sssss;
     const record = prevBest>0 && v>prevBest;
@@ -963,6 +1214,11 @@ function renderProgress(){
   const chrono=[...logs].reverse(); // ancien -> récent
   const ssVals=chrono.map(l=>l.sssss);
   const senVals=chrono.map(l=>l.sens);
+  const topLogs=chrono.filter(l=>l.top!=null);
+  const topVals=topLogs.map(l=>l.top);
+  const bestTop=topVals.length?Math.max(...topVals):null;
+  const vfeVals=chrono.filter(l=>l.vfeBest!=null).map(l=>l.vfeBest);
+  const bestVfe=vfeVals.length?Math.max(...vfeVals):null;
   const total=logs.length;
   const st=streak();
   const bestSS=ssVals.length?Math.max(...ssVals):0;
@@ -996,6 +1252,13 @@ function renderProgress(){
       <div class="stat"><div class="v">${total}</div><div class="k">séances</div></div>
       <div class="stat"><div class="v">${st}🔥</div><div class="k">jours d’affilée</div></div>
       <div class="stat"><div class="v">${bestSS}s</div><div class="k">meilleur souffle</div></div>
+      <div class="stat"><div class="v">${bestTop!=null?midiName(bestTop):"—"}</div><div class="k">sommet validé</div></div>
+    </div>
+
+    <div class="card chart-card">
+      <h3>Tessiture validée — sommet « propre » par séance</h3>
+      ${topVals.length?lineChart(topVals,"#5fd08a"):`<div class="empty">Valide tes rounds avec ✓ Propre pendant les vocalises : ton sommet réel apparaîtra ici, séance après séance.</div>`}
+      ${bestVfe!=null?`<div class="vfe-line">⏱ Record VFE (tenue max) : <b>${bestVfe.toFixed(1)} s</b></div>`:""}
     </div>
 
     <div class="card chart-card">
@@ -1252,66 +1515,126 @@ function midiToFreq(m){ return 440*Math.pow(2,(m-69)/12); }
 const PATTERNS={
   arpUp:[0,4,7,12],
   arpUpDown:[0,4,7,12,7,4,0],
+  arp9:[0,4,7,12,16,12,7,4,0],            // arpège jusqu'à la 10e (octave + tierce)
   scale5:[0,2,4,5,7,5,4,2,0],
   scaleOct:[0,2,4,5,7,9,11,12,11,9,7,5,4,2,0],
+  scale9:[0,2,4,5,7,9,11,12,14,12,11,9,7,5,4,2,0], // gamme jusqu'à la 9e
+  melisma:[7,5,4,2,0,4,2,0],              // run descendant orné (riff pop/gospel)
 };
-// ---- SYSTÈME DE PHASES : appel-réponse (écoute → à toi) + sous-étapes ----
-function patDur(patName, tempo, art){
-  if(art==="sustain") return 2.6;
+// ---- SYSTÈME DE PHASES : appel-réponse (écoute → à toi) + sous-étapes + sirènes guidées ----
+// Niveau : "std" (confirmé) / "adv" (avancé : plus haut, plus de répétitions, plus rapide)
+function lvRoot(){ return (S.level==="adv"?2:0) + Math.min(S.cycle-1,4); }
+function lvRounds(){ return S.level==="adv"?2:0; }
+function lvTempo(){ return (S.level==="adv"?1.1:1) * (1+.03*Math.min(S.cycle-1,4)); }
+function patDur(patName, tempo){
   const pat=PATTERNS[patName]||[0]; const beat=60/(tempo||90);
   return pat.length*beat + .3;
 }
-// motif mélodique : rounds × (écoute le piano → à toi de reproduire), +1 demi-ton par round
 function crMel(patName, root, rounds, opt={}){
-  const tempo=opt.tempo||90, art=opt.art||"legato", d=patDur(patName,tempo,art);
-  const sl=opt.singLabel||"Reproduis exactement ce que tu viens d’entendre", ph=[];
+  const tempo=opt.tempo||90, art=opt.art||"legato", d=patDur(patName,tempo);
+  const sl=opt.singLabel||"Reproduis exactement le modèle", ll=opt.listenLabel||"Modèle au piano — écoute", ph=[];
   for(let i=0;i<rounds;i++){
     const r=root+i;
-    ph.push({mode:"listen", sec:Math.max(4,Math.ceil(d+1.3)), play:{pat:patName,root:r,tempo,art}, note:r, label:"Le piano joue le modèle — écoute bien"});
-    ph.push({mode:"sing",   sec:Math.ceil(d+2),               play:{pat:patName,root:r,tempo,art}, note:r, ref:true, label:sl});
+    ph.push({mode:"listen", sec:Math.max(4,Math.ceil(d+1.2)), play:{pat:patName,root:r,tempo,art}, note:r, label:ll});
+    ph.push({mode:"sing",   sec:Math.ceil(d+1.5),             play:{pat:patName,root:r,tempo,art}, note:r, ref:true, label:sl});
   }
   return ph;
 }
-// note tenue : rounds × (écoute la note → tiens-la), +1 demi-ton par round
 function crSus(root, rounds, opt={}){
-  const hold=opt.holdSec||8, sl=opt.singLabel||"Tiens la note, stable et soutenue", ph=[];
+  const hold=opt.holdSec||8, sl=opt.singLabel||"Tiens le son, stable et soutenu", ll=opt.listenLabel||"Cible — écoute", ph=[];
   for(let i=0;i<rounds;i++){
     const r=root+i;
-    ph.push({mode:"listen", sec:4,    play:{note:r,art:"sustain"}, note:r, label:opt.listenLabel||"Écoute la note de référence"});
+    ph.push({mode:"listen", sec:3,    play:{note:r,art:"sustain"}, note:r, label:ll});
     ph.push({mode:"sing",   sec:hold, play:{note:r,art:"sustain"}, note:r, ref:true, sustain:true, label:sl});
   }
   return ph;
 }
-function doP(label, sec){ return {mode:"do", sec, label}; }
-function glissP(lo, hi, label){ return {mode:"listen", sec:5, play:{gliss:[lo,hi]}, note:lo, label:label||"Écoute la sirène (le mouvement à reproduire)"}; }
 
-// modèles par titre d'étape (root MIDI ; Do3=48). Ténor : on peut transposer largement à l'écran.
+// descripteurs par titre d'étape (root MIDI ; Do3=48 ; ténor). f = mel / sus / seq
 const SPEC={
-  "Attaques équilibrées": crSus(48,5,{holdSec:6, listenLabel:"Écoute la note", singLabel:"Attaque nette sur « é » — ni soufflé, ni coup de glotte"}),
-  "Justesse — note tenue (drone)": crSus(48,5,{holdSec:9, singLabel:"Tiens la note, parfaitement stable (le bourdon t’aide)"}),
-  "Justesse — gamme 5 notes": crMel("scale5",48,6,{tempo:88, singLabel:"Reproduis la gamme, bien juste"}),
-  "Justesse — intervalles": crMel("arpUpDown",48,5,{tempo:90, singLabel:"Reproduis l’arpège, chaque note juste"}),
-  "Résonance — ng → a": crSus(50,5,{holdSec:8, listenLabel:"Écoute la note", singLabel:"« ng » puis ouvre sur « a » en gardant le buzz à l’avant"}),
-  "Résonance — nay nay nay": crMel("arpUp",50,5,{tempo:100, singLabel:"« nay nay nay » brillant — cherche le ring qui coupe"}),
-  "Passaggio — goug / mum": crMel("arpUpDown",50,6,{tempo:92, singLabel:"« goug » sur l’arpège, connecté, sans craquer"}),
-  "Agilité — gammes rapides": crMel("scaleOct",48,5,{tempo:138, singLabel:"Reproduis la gamme rapide — légère et précise"}),
-  "Agilité — staccato": crMel("arpUpDown",48,5,{tempo:120, art:"staccato", singLabel:"Notes piquées, nettes et légères"}),
-  "Nuances — messa di voce": crSus(50,4,{holdSec:14, singLabel:"Crescendo doux→fort puis decrescendo — hauteur stable"}),
-  "SOVT — sirènes larges": [glissP(43,60), doP("Sirènes (paille / lip trills) — traverse TOUT ton registre, passe la rupture sans t’arrêter",235)],
-  "Passaggio — sirènes ng": [glissP(48,60), doP("Sirènes sur « ng » à travers le break, lentement, sans craquer",115)],
-  "SOVT — paille": [glissP(45,57), doP("Paille dans l’eau, glissandos doux. Rien d’autre — pas d’aigu, pas de fort",235)],
-  "Lip trills doux": [doP("Lip trills « brrr » en glissando, très doux, sur toute l’étendue",180)],
-  "Sirènes légères": [glissP(45,57), doP("Sirènes douces sur « ng », sans forcer — laisse revenir l’émission",175)],
+  "Attaques équilibrées":{f:"sus",root:52,rounds:6,holdSec:5,listenLabel:"La cible",singLabel:"Onset « é » net et instantané — bord des cordes franc, ni soufflé ni dur"},
+  "Justesse — note tenue (drone)":{f:"sus",root:53,rounds:6,holdSec:8,listenLabel:"La cible",singLabel:"Son filé : justesse au centre, vibrato libre et régulier"},
+  "Justesse — gamme 5 notes":{f:"mel",pat:"scale5",root:53,rounds:7,tempo:100,singLabel:"Gamme legato, voyelle pure, chaque degré exact"},
+  "Justesse — intervalles":{f:"mel",pat:"arpUpDown",root:53,rounds:7,tempo:108,singLabel:"Arpège d'octave — tierce et quinte justes, octave ouverte"},
+  "Résonance — ng → a":{f:"sus",root:55,rounds:6,holdSec:7,listenLabel:"La cible",singLabel:"« ng »→« a » : garde le squillo (≈3 kHz) en ouvrant la voyelle"},
+  "Résonance — nay nay nay":{f:"mel",pat:"arpUp",root:55,rounds:6,tempo:116,singLabel:"« nay » twang assumé — brillance qui projette sur tout l'arpège"},
+  "Passaggio — goug / mum":{f:"mel",pat:"arp9",root:53,rounds:7,tempo:100,singLabel:"« goug » jusqu'à la 10e — passaggio connecté, voile fermé, sans bascule"},
+  "Agilité — gammes rapides":{f:"mel",pat:"scale9",root:52,rounds:6,tempo:152,singLabel:"Run de neuvième — léger, articulé, larynx stable, à tempo"},
+  "Agilité — staccato":{f:"mel",pat:"arp9",root:52,rounds:6,tempo:138,art:"staccato",singLabel:"Staccato sur la 10e — appui constant, attaques perlées"},
+  "Nuances — messa di voce":{f:"sus",root:55,rounds:5,holdSec:16,singLabel:"Messa di voce : pp→ff→pp, hauteur et timbre immobiles"},
+  "Agilité — mélisme":{f:"fn",make:()=>[
+    ...crMel("melisma",55+lvRoot(),2,{tempo:96, listenLabel:"Le run, lentement — mémorise le dessin", singLabel:"Reproduis lentement — chaque note définie, pas de glissé"}),
+    ...crMel("melisma",57+lvRoot(),3+lvRounds(),{tempo:Math.round(144*lvTempo()), singLabel:"À tempo : run fluide, appui constant, articulation laryngée légère"}),
+  ]},
+  "Modification de voyelle":{f:"sus",root:62,rounds:4,holdSec:6,listenLabel:"La note haute — cible",singLabel:"Tiens : « i→é », « a→ɔ » — aggiustamento, la gorge se désamorce, le squillo reste"},
+  "Voyelles — égalisation":{f:"sus",root:55,rounds:4,holdSec:10,listenLabel:"La note — cible",singLabel:"i-é-a-o-ou sur la note : même placement, même intensité, même timbre — seule la bouche bouge"},
+  "Legato — ligne":{f:"mel",pat:"scale5",root:53,rounds:5,tempo:66,singLabel:"« ou » pur, legato absolu — aucun trou entre les notes, l’air coule comme un archet"},
+  "Vibrato — libération":{f:"sus",root:55,rounds:4,holdSec:12,listenLabel:"La note — cible",singLabel:"5-6 s de son droit bien appuyé… puis RELÂCHE : le vibrato s’installe seul, régulier"},
+  "Retour au calme":{f:"seq",phases:[{mode:"siren",dir:"down",guide:[45,57],sec:60,label:"Fredonne en suivant les descentes — mâchoire relâchée, volume décroissant"}]},
+  /* — Oreille — */
+  "Oreille — mémoire tonale":{f:"fn",make:()=>[48,53,50,57,52,55].map(n=>n+lvRoot()).flatMap(r=>[
+    {mode:"listen",sec:3,play:{note:r,art:"sustain"},note:r,label:"Écoute la note… et grave-la"},
+    {mode:"do",sec:3,label:"Silence — garde-la précisément en tête"},
+    {mode:"sing",sec:5,note:r,label:"Chante-la de mémoire, sans aide"},
+    {mode:"listen",sec:3,play:{note:r,art:"sustain"},note:r,label:"Vérification — étais-tu exactement dessus ?"},
+  ])},
+  "Oreille — intervalles chantés":{f:"fn",make:()=>[4,7,5,9,3,12].flatMap((iv,k)=>{const r=50+lvRoot()+(k%3);return [
+    {mode:"listen",sec:4,play:{seq:[0,iv],root:r,tempo:66},note:r,label:"Deux notes — écoute l’écart"},
+    {mode:"sing",sec:5,play:{seq:[0,iv],root:r,tempo:66},note:r,ref:true,label:"Chante les DEUX notes, l’écart exact"},
+    {mode:"listen",sec:3,play:{seq:[0,iv],root:r,tempo:66},note:r,label:"Vérification"},
+  ];})},
+  "Oreille — intonation battements":{f:"fn",make:()=>[48,50].map(n=>n+lvRoot()).flatMap(r=>[
+    {mode:"sing",sec:15,note:r,sustain:true,label:"Bourdon sur la fondamentale — chante la TIERCE MAJEURE juste au-dessus : cale-toi jusqu’à la disparition des battements"},
+    {mode:"sing",sec:15,note:r,sustain:true,label:"Même fondamentale — chante la QUINTE juste : cherche la fusion parfaite, zéro battement"},
+    {mode:"sing",sec:15,note:r,sustain:true,label:"Même fondamentale — chante l’OCTAVE : les deux sons doivent fondre en un"},
+  ])},
+  /* — VFE (Stemple) — */
+  "VFE 1 — Tenue maximale « i »":{f:"seq",phases:[
+    {mode:"listen",sec:3,play:{note:53,art:"sustain"},note:53,label:"La note — confortable, médium"},
+    {mode:"do",sec:60,chrono:true,note:53,label:"« i » doux et clair, le plus longtemps possible — lance le chrono (2 essais)"},
+  ]},
+  "VFE 2 — Glissé grave → aigu":{f:"seq",phases:[{mode:"siren",dir:"up",guide:[40,66],sec:45,label:"« knoll » (ou lip trill) du plus grave au plus aigu — sans trou ni cassure"}]},
+  "VFE 3 — Glissé aigu → grave":{f:"seq",phases:[{mode:"siren",dir:"down",guide:[40,66],sec:45,label:"Du plus aigu au plus grave — descends sans décrocher"}]},
+  "VFE 4 — Cinq tenues maximales":{f:"fn",make:()=>[48,50,52,53,55].flatMap(n=>[
+    {mode:"listen",sec:3,play:{note:n,art:"sustain"},note:n,label:"La note"},
+    {mode:"do",sec:45,chrono:true,note:n,label:"« ol » tenu au MAXIMUM — chronomètre, puis note suivante"},
+  ])},
+  "Réveil — sirènes":{f:"seq",phases:[{mode:"siren",guide:[43,62],sec:90,label:"Paille ou lip trills — suis la sirène, réveille toute l’étendue sans forcer"}]},
+  "SOVT — sirènes larges":{f:"seq",phases:[{mode:"siren",guide:[40,64],sec:240,label:"Sirène large (paille ou lip) — traverse les deux passaggi sans accroc ni rupture"}]},
+  "Passaggio — sirènes ng":{f:"seq",phases:[{mode:"siren",guide:[48,64],sec:120,label:"Sirène « ng » à travers le passaggio — transition fluide, pression d'air constante"}]},
+  "SOVT — paille":{f:"seq",phases:[{mode:"siren",guide:[43,60],sec:240,label:"Paille dans l'eau — suis la sirène, débit d'air régulier, contre-pression stable"}]},
+  "Lip trills doux":{f:"seq",phases:[{mode:"siren",guide:[43,62],sec:180,label:"Lip trills « brrr » — suis la sirène, vibration constante sur toute l'étendue"}]},
+  "Sirènes légères":{f:"seq",phases:[{mode:"siren",guide:[45,60],sec:180,label:"Sirène « ng » légère — laisse l'émission se rétablir, sans forcer"}]},
 };
+// Départ calibré : si un record validé existe pour cet exercice, on démarre
+// pour que le DERNIER round vise record+1 (surcharge progressive), borné autour de la base.
+function adaptRoot(title, base, rounds){
+  const top=S.tops[title]; if(top==null) return base;
+  const start=top+2-rounds;
+  return Math.max(base-3, Math.min(base+10, start));
+}
+// Récupération physiologique après les exercices les plus coûteux
+const RECOVER_AFTER=new Set(["Agilité — gammes rapides","Agilité — staccato","Agilité — mélisme","Nuances — messa di voce","Passaggio — goug / mum","Résonance — nay nay nay"]);
 function buildPhases(step){
+  const out=buildPhasesRaw(step);
+  if(RECOVER_AFTER.has(step.t)) out.push({mode:"do",sec:15,label:"Récupération — souffle silencieux par le nez, épaules relâchées, déglutis, secoue doucement la mâchoire"});
+  return out;
+}
+function buildPhasesRaw(step){
   if(Array.isArray(step.ph) && step.ph.length) return step.ph.map(p=>({...p}));
-  if(SPEC[step.t]) return SPEC[step.t].map(p=>({...p}));
+  const sp=SPEC[step.t];
+  if(sp){
+    if(sp.f==="fn") return sp.make();
+    if(sp.f==="mel"){ const n=sp.rounds+lvRounds(); return crMel(sp.pat, adaptRoot(step.t, sp.root+lvRoot(), n), n, {tempo:Math.round(sp.tempo*lvTempo()), art:sp.art, singLabel:sp.singLabel, listenLabel:sp.listenLabel}); }
+    if(sp.f==="sus"){ const n=sp.rounds+lvRounds(); return crSus(adaptRoot(step.t, sp.root+lvRoot(), n), n, {holdSec:sp.holdSec, listenLabel:sp.listenLabel, singLabel:sp.singLabel}); }
+    if(sp.f==="seq") return sp.phases.map(p=>{ const q={...p}; if(S.level==="adv" && q.guide) q.guide=[q.guide[0]-2,q.guide[1]+2]; return q; });
+  }
   return [{mode:"do", sec:step.s, label:(step.c||[]).join(" · ")||step.t}];
 }
 function exDurMs(step){ return buildPhases(step).reduce((a,p)=>a+p.sec*1000,0); }
 let modelNodes=[], modelPlayTO=null;
 function pianoNote(freq,t,len){
-  const c=audio();
+  const c=audio(); if(!c||S.muted) return;
   const g=c.createGain(); g.connect(c.destination);
   const oscs=[[1,.5,"triangle"],[2,.16,"sine"],[3,.07,"sine"]].map(([mu,a,tp])=>{
     const o=c.createOscillator(); o.type=tp; o.frequency.value=freq*mu;
@@ -1323,28 +1646,12 @@ function pianoNote(freq,t,len){
   g.gain.exponentialRampToValueAtTime(.0001,t+len);
   modelNodes.push({oscs,g});
 }
-function glissModel(loM,hiM){
-  const c=audio(); const lo=midiToFreq(loM), hi=midiToFreq(hiM);
-  const g=c.createGain(); g.connect(c.destination);
-  const o=c.createOscillator(); o.type="triangle"; o.connect(g);
-  const t=c.currentTime+.05, half=1.4;
-  o.frequency.setValueAtTime(lo,t);
-  o.frequency.exponentialRampToValueAtTime(hi,t+half);
-  o.frequency.exponentialRampToValueAtTime(lo,t+2*half);
-  g.gain.setValueAtTime(0,t);
-  g.gain.linearRampToValueAtTime(.16,t+.12);
-  g.gain.setValueAtTime(.16,t+2*half-.15);
-  g.gain.linearRampToValueAtTime(0,t+2*half);
-  o.start(t); o.stop(t+2*half+.05);
-  modelNodes.push({oscs:[o],g});
-}
 function playPhaseModel(play){
   audio(); stopModel();
   if(!play) return;
-  const tr=S.tr||0;
-  if(play.gliss){ glissModel(play.gliss[0]+tr, play.gliss[1]+tr); markPlaying(2.9); return; }
+  const tr=totTr();
   if(play.note!=null && play.art==="sustain"){ pianoNote(midiToFreq(play.note+tr), audio().currentTime+.05, 1.6); markPlaying(1.7); return; }
-  const seq=PATTERNS[play.pat]||[0];
+  const seq=play.seq||PATTERNS[play.pat]||[0];
   const root=(play.root!=null?play.root:48)+tr, tempo=play.tempo||90, beat=60/tempo, art=play.art||"legato";
   const len=(art==="staccato")?Math.min(.16,beat*.45):beat*.92;
   const c=audio(); let t=c.currentTime+.06;
@@ -1371,15 +1678,56 @@ function stopHold(){
   try{ holdNodes.g.gain.cancelScheduledValues(c.currentTime); holdNodes.g.gain.setValueAtTime(0,c.currentTime); holdNodes.o.stop(); holdNodes.o2.stop(); }catch(e){}
   holdNodes=null;
 }
+// SIRÈNE-GUIDE : glissando continu à suivre (paille, lip trills, ng).
+// dir: undefined=aller-retour · "down"=descentes répétées · "up"=montées répétées (fondu au reset)
+let sirenNodes=null;
+function startSiren(loM, hiM, durSec, dir){
+  stopSiren(); const c=audio(); if(!c||S.muted) return;
+  const lo=midiToFreq(loM), hi=midiToFreq(Math.max(loM+2,hiM));
+  const g=c.createGain(); g.gain.value=0; g.connect(c.destination);
+  const o=c.createOscillator(); o.type="triangle"; o.connect(g);
+  const og=c.createGain(); og.gain.value=.5; const o2=c.createOscillator(); o2.type="sine"; o2.connect(og); og.connect(g);
+  const t0=c.currentTime+.05, end=t0+durSec, V=.17;
+  const setF=(f,at)=>{ o.frequency.setValueAtTime(f,at); o2.frequency.setValueAtTime(f,at); };
+  const rampF=(f,at)=>{ o.frequency.exponentialRampToValueAtTime(f,at); o2.frequency.exponentialRampToValueAtTime(f,at); };
+  if(dir==="down"||dir==="up"){
+    const from=dir==="down"?hi:lo, to=dir==="down"?lo:hi;
+    const cyc=4.0, fade=.22; let t=t0; setF(from,t0);
+    g.gain.linearRampToValueAtTime(V,t0+fade);
+    while(t<end-0.01){
+      const nt=Math.min(t+cyc,end);
+      rampF(to,nt-fade);
+      g.gain.setValueAtTime(V,Math.max(t,nt-fade));
+      g.gain.linearRampToValueAtTime(0,nt);
+      if(nt<end-0.01){ setF(from,nt); g.gain.linearRampToValueAtTime(V,nt+fade); }
+      t=nt;
+    }
+  } else {
+    const half=2.4; let t=t0, up=true; setF(lo,t0);
+    while(t<end-0.01){ const nt=Math.min(t+half,end); rampF(up?hi:lo,nt); t=nt; up=!up; }
+    g.gain.linearRampToValueAtTime(V,t0+.15);
+    g.gain.setValueAtTime(V,Math.max(t0+.3,end-.25));
+    g.gain.linearRampToValueAtTime(0,end);
+  }
+  o.start(t0); o2.start(t0); o.stop(end+.05); o2.stop(end+.05);
+  sirenNodes={o,o2,g};
+}
+function stopSiren(){
+  if(!sirenNodes) return; const c=audio();
+  try{ sirenNodes.g.gain.cancelScheduledValues(c.currentTime); sirenNodes.g.gain.setValueAtTime(0,c.currentTime); sirenNodes.o.stop(); sirenNodes.o2.stop(); }catch(e){}
+  sirenNodes=null;
+}
 function phaseCue(mode){
   if(S.muted) return;
   if(mode==="listen"){ tone(523.25,0,.14,.18); }
   else if(mode==="sing"){ tone(784,0,.12,.2); tone(1046.5,.1,.16,.18); }
+  else if(mode==="siren"){ tone(440,0,.14,.16); }
   else { tone(660,0,.16,.2); }
 }
 function phaseAnnounce(ph){
   if(ph.mode==="listen") return "Écoute le modèle";
   if(ph.mode==="sing") return "À toi : "+(ph.label||"reproduis");
+  if(ph.mode==="siren") return "Suis la sirène : "+(ph.label||"");
   return ph.label||"Exercice";
 }
 function stopModel(){
@@ -1402,6 +1750,69 @@ function markPlaying(dur){
    « COMMENT FAIRE ? » — explications détaillées par étape
    ========================================================= */
 const HOW={
+  "Oreille — mémoire tonale":[
+    "On ne chante juste que ce qu’on entend précisément — et la précision se joue dans la mémoire tonale : garder une hauteur exacte en tête, sans support.",
+    "Le piano joue une note (3 s), puis SILENCE (3 s) : pendant ce silence, « entends » la note dans ta tête, comme si elle sonnait encore. Puis chante-la.",
+    "La vérification rejoue la note : compare honnêtement. Étais-tu dessus, un peu haut, un peu bas ? C’est cette comparaison répétée qui affine l’oreille.",
+    "Niveau expert : pendant le silence, compte à rebours de 3 à 1 à voix haute mentalement — garder la note malgré une distraction, c’est la vraie mémoire tonale.",
+  ],
+  "Oreille — intervalles chantés":[
+    "Un intervalle, c’est une distance entre deux notes. Les reconnaître et les reproduire exactement est le socle de la justesse mélodique.",
+    "Le piano joue deux notes : chante-les toutes les deux, en visant l’ÉCART exact, pas juste « vers le haut ». La vérification te permet de comparer.",
+    "Repères utiles : tierce majeure = début de « Oh happy day » ; quarte = « Ô Canada » ; quinte = « Ainsi parlait Zarathoustra » ; octave = « Somewhere over the rainbow ».",
+    "Si un intervalle t’échappe systématiquement (souvent la sixte), c’est lui qu’il faut répéter — pas ceux que tu réussis.",
+  ],
+  "Oreille — intonation battements":[
+    "Quand deux sons sont PRESQUE justes, on entend des « battements » — des ondulations de volume (wow-wow-wow). Parfaitement justes, les battements disparaissent : le son fusionne.",
+    "Le bourdon tient la fondamentale. Chante l’intervalle demandé au-dessus, puis micro-ajuste ta hauteur en écoutant : les battements ralentissent quand tu approches… et s’éteignent quand c’est juste.",
+    "C’est de l’intonation de précision, auto-vérifiable à l’oreille — la compétence des choristes et quatuors professionnels. Chante doux : on entend mieux les battements.",
+    "Ordre de difficulté : octave (facile), quinte, tierce majeure (la plus fine). Prends ton temps sur chacune.",
+  ],
+  "VFE 1 — Tenue maximale « i »":[
+    "Les Vocal Function Exercises (Stemple) sont le protocole de musculation vocale le plus validé scientifiquement. Exercice 1 : l’endurance.",
+    "Sur la note donnée (médium confortable), tiens un « i » DOUX et clair le plus longtemps possible. Pas fort : doux, stable, timbré.",
+    "Lance le chrono au départ du son, arrête-le à la fin. Fais 2 essais, garde le meilleur. La durée doit progresser au fil des semaines — c’est TA mesure objective.",
+    "Référence : un adulte entraîné dépasse 25-30 s. Le secret n’est pas d’avoir de grands poumons, mais de ne pas gaspiller l’air (fermeture cordale efficace).",
+  ],
+  "VFE 2 — Glissé grave → aigu":[
+    "Exercice 2 du protocole : l’étirement. Comme un stretching des plis vocaux, du plus grave au plus aigu de TON étendue.",
+    "Sur « knoll » (ou lip trill si plus facile) : glisse continûment vers le haut en suivant la sirène. L’important : AUCUN trou, aucune cassure — si ça casse, ralentis et allège.",
+    "Ne force jamais le sommet : va aussi haut que le son reste connecté, même tout petit. L’étendue s’ouvre avec les jours, pas en poussant.",
+  ],
+  "VFE 3 — Glissé aigu → grave":[
+    "Exercice 3 : la contraction — le miroir du précédent, du plus aigu au plus grave.",
+    "Descends continûment avec la sirène, sans « lâcher » le son dans le grave (piège classique : la voix qui s’éteint ou passe en friture). Garde le son timbré jusqu’en bas.",
+    "Cette descente contrôlée muscle la fermeture dans le grave et stabilise le larynx. Doux, connecté, régulier.",
+  ],
+  "VFE 4 — Cinq tenues maximales":[
+    "Exercice 4, le cœur du protocole : cinq notes du médium (Do-Ré-Mi-Fa-Sol), chacune tenue LE PLUS LONGTEMPS possible sur « ol ».",
+    "« ol » = voyelle « o » avec la langue en position de « l » : ça place le son en avant avec un voile haut. Doux, clair, stable.",
+    "Chronomètre chaque note. C’est exigeant : c’est normal que les dernières soient plus courtes. Tes moyennes doivent grimper au fil des semaines.",
+    "Stemple recommande ce protocole 2×/jour (matin/soir). Même 1×/jour, 4-5 jours/semaine, donne des résultats mesurables en 4-6 semaines.",
+  ],
+  "Réveil — sirènes":[
+    "L’échauffement express avant de chanter : le SOVT réveille l’émission en 90 secondes sans fatiguer.",
+    "Paille ou lip trills, en suivant la sirène sur toute ton étendue confortable. Facile, fluide, sans jamais forcer le haut.",
+    "Si tu n’as que 2 minutes avant de monter sur scène : c’est CET exercice qu’il faut faire.",
+  ],
+  "Voyelles — égalisation":[
+    "L’objectif : que tes cinq voyelles aient le MÊME timbre, la même intensité, la même place — c’est ce qui donne une ligne vocale homogène et professionnelle.",
+    "Sur la note tenue, enchaîne i-é-a-o-ou sans reprendre ton souffle si possible. Seule la bouche (langue + lèvres) change de forme : la gorge, le larynx et le soutien ne bougent PAS.",
+    "Piège classique : « a » qui devient plus fort et « ou » qui s’éteint. Égalise : pense que toutes les voyelles vivent dans la même « maison » de résonance, à l’avant.",
+    "Valide ✓ seulement si les cinq voyelles sonnent comme des sœurs. Si une voyelle décroche (souvent « i » qui pince ou « ou » qui recule), ✗ et recommence un demi-ton plus bas.",
+  ],
+  "Legato — ligne":[
+    "Le legato est LA marque d’une belle voix : les notes se touchent, l’air ne s’interrompt jamais. Pense à un archet de violoncelle qui ne quitte pas la corde.",
+    "Sur « ou » pur (lèvres arrondies détendues), suis la gamme lente du piano. Le passage d’une note à l’autre se fait PAR le souffle, sans coup de glotte, sans « h », sans creux.",
+    "Astuce : imagine que tu chantes UNE seule note longue dont la hauteur bouge. Le volume reste parfaitement égal — c’est le souffle qui pilote, pas la gorge.",
+    "Si tu entends des marches d’escalier (notes détachées), ralentis mentalement : arrive sur chaque note par glissement d’air continu.",
+  ],
+  "Vibrato — libération":[
+    "Un beau vibrato ne se fabrique pas : il s’installe quand le soutien est actif et la gorge libre. Cet exercice crée les conditions, puis te fait « lâcher ».",
+    "Phase 1 (5-6 s) : son droit, bien appuyé, timbre riche, zéro oscillation volontaire. Tu construis la pression sous-glottique stable.",
+    "Phase 2 : sans rien changer d’autre, RELÂCHE le contrôle du « droit ». Si le soutien tient et que la mâchoire/langue sont libres, une ondulation régulière (5-6 par seconde) apparaît d’elle-même.",
+    "Si rien ne vient : ne force jamais une oscillation avec la mâchoire ou le ventre (faux vibrato). Reviens au son droit, vérifie mâchoire pendante + soutien bas, et re-lâche. Ça vient avec les jours.",
+  ],
   "Souffle & appui":[
     "Pose une main sur le ventre. Inspire par le nez en laissant le ventre et les côtes basses s’écarter — les épaules ne montent pas. C’est la respiration basse (diaphragmatique).",
     "1) D’abord un réglage, SANS son : 4 respirations basses lentes, juste pour sentir le mouvement et te poser.",
@@ -1542,8 +1953,7 @@ function celebrateSound(){
 /* =========================================================
    PERSISTANCE position + prefs
    ========================================================= */
-async function savePos(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal}); }
-async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal}); }
+async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal,level:S.level,cycle:S.cycle}); }
 
 /* =========================================================
    BOOT
@@ -1555,8 +1965,11 @@ async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.we
     if(prefs.week>=1&&prefs.week<=3) S.week=prefs.week;
     if(prefs.day>=1&&prefs.day<=7) S.day=prefs.day;
     if([3,5,8].includes(prefs.prepSecs)) S.prepSecs=prefs.prepSecs;
+    if(prefs.level==="adv"||prefs.level==="std") S.level=prefs.level;
     if(prefs.goal>=10&&prefs.goal<=120) S.goal=prefs.goal;
+    if(Number.isInteger(prefs.cycle)&&prefs.cycle>=1&&prefs.cycle<=9) S.cycle=prefs.cycle;
   }
+  S.tops=await Store.getJSON(K_TOPS,{}) || {};
   S.logs=await Store.getJSON(K_LOGS,[]) || [];
   renderHome();
 })();
