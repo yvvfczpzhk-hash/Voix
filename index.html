@@ -62,7 +62,17 @@
   .eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.22em;color:var(--muted-2);font-weight:700;margin:22px 0 11px}
 
   /* ---------- home ---------- */
-  .weeks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .weeks{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .months{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:4px}
+  .month{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border-radius:var(--radius);
+    padding:10px 12px;background:var(--surface);border:1px solid var(--border);transition:border-color .18s,background .18s,transform .1s}
+  .month:active{transform:scale(.97)}
+  .month .mi{font-size:1.05rem}
+  .month .mn{font-weight:800;font-size:.82rem;color:var(--ink)}
+  .month small{font-size:.68rem;color:var(--muted-2);line-height:1.2}
+  .month.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+  .prog-track{height:5px;border-radius:99px;background:var(--surface-2);margin:2px 0 16px;overflow:hidden}
+  .prog-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .3s ease}
   .week{
     text-align:left;border-radius:var(--radius);padding:14px 12px 13px;
     background:var(--surface);border:1px solid var(--border);
@@ -381,78 +391,325 @@
 /* =========================================================
    DONNÉES — programme 3 semaines
    ========================================================= */
+const MONTHS=[
+  {n:1,name:"Fondations",icon:"🏛",weeks:[1,2,3,4],accent:"#D99A5B",ink:"#1a1208"},
+  {n:2,name:"Connexion & registres",icon:"🌉",weeks:[5,6,7,8],accent:"#6FB3A8",ink:"#0a1f1c"},
+  {n:3,name:"Timbre & expression",icon:"🎨",weeks:[9,10,11,12],accent:"#7FB2F0",ink:"#081524"},
+  {n:4,name:"Virtuosité & scène",icon:"🔥",weeks:[13,14,15,16],accent:"#E07856",ink:"#240d05"},
+];
+function monthOf(w){ return MONTHS.find(m=>m.weeks.includes(w))||MONTHS[0]; }
 const WEEKS = {
-  1:{ theme:"Fondations", accent:"#D99A5B", ink:"#1a1208",
-      obj:"Souffle, émission, justesse de base. On ne cherche pas l’aigu.",
-      steps:[
-        {t:"Souffle & appui", s:180, c:[`1) Réglage, SANS son : 4 respirations basses lentes — le ventre se gonfle à l’inspir, épaules immobiles`,`2) L’exercice (× 4-5) : inspire bas, PUIS expire sur un « sssss » long et régulier jusqu’à presque vide`,`1 inspiration = 1 « sssss ». Reprends une inspiration entre chaque · note ton meilleur temps`], tip:`Le filet d’air reste constant : ni faiblard, ni qui s’emballe.`,
-          ph:[{mode:"do",sec:40,label:"Appoggio : 4 respirations basses costo-diaphragmatiques — épaules immobiles, soutien bas"},{mode:"do",sec:140,label:"« sssss » d'appui : débit d'air constant, le plus long possible (1 inspiration = 1 sss)"}]},
-        {t:"SOVT — paille & lip trills", s:300, c:[`Paille dans l’eau, glissandos doux grave↔aigu (2 min)`,`Lip trills « brrr » en glissando puis gamme 5 notes (2 min)`,`« ng » / « mmm » bouche fermée (1 min)`], tip:`Tout reste facile. Jamais forcer.`,
-          ph:[{mode:"siren",guide:[45,60],sec:120,label:"Paille dans l'eau — suis la sirène, contre-pression régulière"},{mode:"siren",guide:[43,62],sec:120,label:"Lip trills « brrr » — suis la sirène sur toute l'étendue"},{mode:"siren",guide:[48,60],sec:60,label:"« ng » fermé — suis la sirène, buzz à l'avant constant"}]},
-        {t:"Attaques équilibrées", s:180, c:[`Note tenue 3-4 s sur « hé » puis « é » (retire le h)`,`Démarrage net et doux : ni soufflé, ni coup de glotte`,`Monte / descends par demi-tons`], tip:`Pense à un petit « ah ! » de surprise agréable.`},
-        {t:"Oreille — mémoire tonale", s:84, c:[`Une note jouée, 3 s de silence, tu la chantes de mémoire`,`Puis vérification au piano`], tip:`On ne chante juste que ce qu’on entend précisément.`},
-        {t:"Justesse — note tenue (drone)", s:120, c:[`Tiens une seule note stable contre le bourdon`,`Accordeur allumé · 3-4 notes différentes`], tip:`L’exercice de vérité pour la stabilité de hauteur.`},
-        {t:"Justesse — gamme 5 notes", s:120, c:[`do-ré-mi-fa-sol-fa-mi-ré-do sur « a », lentement`,`À l’accordeur · monte d’un demi-ton à chaque fois`]},
-        {t:"Justesse — intervalles", s:120, c:[`do-mi puis do-sol (tierces, quintes), vérifiés au piano`,`Puis l’arpège do-mi-sol-do`]},
-        {t:"Retour au calme", s:60, c:[`Fredonnement doux descendant`,`Relâche la mâchoire`]},
-      ],
+  /* ============ MOIS 1 — FONDATIONS ============ */
+  1:{ theme:"Appui & émission", accent:"#D99A5B", ink:"#1a1208", boost:{r:0,t:0},
+      obj:"Le socle : souffle, onset propre, premières notes ancrées. On ne cherche pas l’aigu.",
       days:{
-        1:`Apprends la routine lentement. Comprends chaque exercice, sans chercher la performance.`,
-        2:`Apprends la routine lentement. Comprends chaque exercice, sans chercher la performance.`,
-        3:`Enregistre la gamme 5 notes + les intervalles. Réécoute : où es-tu faux ?`,
-        4:`Reprends en corrigeant ce que tu as entendu. Étends la gamme un demi-ton si confortable.`,
-        5:`Reprends en corrigeant ce que tu as entendu. Étends la gamme un demi-ton si confortable.`,
-        6:`Jour léger : moitié des répétitions, focus détente.`,
-        7:`Réenregistre les exercices de J3 et compare. Regarde ton « sssss » qui s’allonge.`,
-      }},
-  2:{ theme:"Connexion", accent:"#E0685E", ink:"#1f0a08",
-      obj:"Passage, mix, résonance, étendue. Passer sans casser.",
+        1:"Découverte : fais tout doucement, repère les sensations d’appui bas.",
+        2:"Focus souffle : le « sssss » parfaitement régulier avant tout le reste.",
+        3:"🎙 Enregistre une note tenue — ta référence de départ, précieuse.",
+        4:"Focus attaques : chaque « é » décidé AVANT d’inspirer.",
+        5:"Focus oreille : prends ton temps sur la mémoire tonale, c’est le socle.",
+        6:"Jour léger : SOVT + oreille seulement si la voix est fatiguée.",
+        7:"🎙 Réenregistre la même note tenue — compare avec J3, note les différences.",
+      },
       steps:[
-        {t:"Souffle & appui", s:120, c:[`Inspire bas, puis expire sur un « sssss » long et régulier — à répéter 2-3 fois (1 inspiration = 1 sss)`]},
-        {t:"SOVT — sirènes larges", s:240, c:[`Paille / lip trills en sirènes`,`Traverse TOUT ton registre, passe la zone de rupture sans t’arrêter`]},
-        {t:"Oreille — intervalles chantés", s:72, c:[`Le piano joue 2 notes : reproduis-les exactement`,`Tierces, quartes, quintes, sixtes, octave`], tip:`L’écart exact, pas juste « vers le haut ».`},
-        {t:"Résonance — ng → a", s:90, c:[`Tiens le « ng », sens le buzz à l’avant`,`Ouvre vers « a » en gardant le buzz · monte par demi-tons`]},
-        {t:"Résonance — nay nay nay", s:90, c:[`« nay nay nay » brillant en arpège do-mi-sol-do`,`Cherche la brillance qui « coupe »`]},
-        {t:"Passaggio — goug / mum", s:180, c:[`« goug » ou « mum » sur arpège do-mi-sol-do-sol-mi-do`,`Lip trill d’abord si ça craque, puis voyelle`,`Monte progressivement dans ta zone de passage`], tip:`La consonne fermée garde les cordes connectées.`},
-        {t:"Passaggio — sirènes ng", s:120, c:[`Sirènes sur « ng » à travers le break`,`Lentement, sans craquer`]},
-        {t:"Modification de voyelle", s:60, c:[`Sur une note haute : « i » → « é », « a » → « o »`,`Sens la tension qui se désamorce`]},
-        {t:"Voyelles — égalisation", s:120, c:[`i-é-a-o-ou enchaînées sur la même note`,`Même placement, même volume — la voyelle change dans la bouche, pas dans la gorge`]},
-        {t:"Legato — ligne", s:120, c:[`Gamme lente sur « ou » pur`,`Le son ne s’interrompt JAMAIS entre les notes — comme un archet`]},
-        {t:"Application répertoire", s:180, c:[`Un passage de ta chanson qui monte (zone de passage)`,`Applique le mix + la modif de voyelle`]},
-        {t:"Retour au calme", s:60, c:[`Fredonnement doux descendant`,`Relâche la mâchoire`]},
-      ],
+        {t:"Souffle & appui", s:180, c:[`Appoggio : respirations basses puis « sssss » long`,`Débit constant — ni faiblard, ni qui s’emballe`], tip:`Le sablier de ton souffle.`},
+        {t:"SOVT — paille & lip trills", s:300, c:[`Paille, lip trills, « ng » en sirènes guidées`,`Tout reste FACILE — jamais forcer`]},
+        {t:"Attaques équilibrées", s:120, c:[`Onsets nets sur « é »`,`Ni soufflé, ni coup de glotte`]},
+        {t:"Oreille — mémoire tonale", s:84, c:[`Note jouée → silence → chante de mémoire`,`Vérification au piano`]},
+        {t:"Justesse — note tenue (drone)", s:120, c:[`Note stable contre le bourdon`,`La stabilité avant tout`]},
+        {t:"Justesse — gamme 5 notes", s:120, c:[`Gammes appel-réponse`,`Chaque degré exact, voyelle pure`]},
+        {t:"Retour au calme", s:60, c:[`Fredonnement descendant guidé`,`Mâchoire relâchée`]},
+      ]},
+  2:{ theme:"Justesse ancrée", accent:"#D99A5B", ink:"#1a1208", boost:{r:0,t:0},
+      obj:"La justesse devient un réflexe : intervalles montants ET descendants, mémoire affinée.",
       days:{
-        1:`Découvre le mix doucement. Le but : passer sans casser, pas chanter fort en haut.`,
-        2:`Découvre le mix doucement. Le but : passer sans casser, pas chanter fort en haut.`,
-        3:`Enregistre les sirènes + le « goug ». Écoute : où ça craque / s’affaiblit ?`,
-        4:`Étends l’arpège un demi-ton plus haut, tant que c’est sans forcer.`,
-        5:`Étends l’arpège un demi-ton plus haut, tant que c’est sans forcer.`,
-        6:`Jour léger : SOVT + sirènes douces seulement.`,
-        7:`Réenregistre, compare à J3. Le passage doit être plus lisse.`,
-      }},
-  3:{ theme:"Application", accent:"#F0B72E", ink:"#241a00",
-      obj:"Agilité, nuances, répertoire. Là, ça sonne.",
+        1:"Reprends les acquis de S1 : appui d’abord, puis précision.",
+        2:"Focus intervalles montants : l’écart exact, pas juste « vers le haut ».",
+        3:"🎙 Enregistre une gamme 5 notes — écoute ta justesse froidement.",
+        4:"Focus descentes : vise chaque note par AU-DESSUS.",
+        5:"Chante tout un cran plus doux aujourd’hui — la justesse aime le piano.",
+        6:"Jour léger : souffle + SOVT + une seule série d’oreille.",
+        7:"🎙 Réenregistre la gamme — la comparaison J3/J7 est ton vrai bulletin.",
+      },
       steps:[
-        {t:"Échauffement express", s:240, c:[`« sssss » + paille / lip trills en sirènes`,`1 min de « ng → a »`], tip:`Tu condenses tout l’acquis des 2 semaines.`,
-          ph:[{mode:"siren",guide:[43,62],sec:120,label:"Paille / lip trills en sirènes — réveille l'émission sur toute l'étendue"},{mode:"do",sec:60,label:"« ng → a » : buzz à l'avant puis ouvre, en montant par demi-tons"},{mode:"do",sec:60,label:"Quelques attaques « é » nettes dans le médium-aigu"}]},
-        {t:"Oreille — intonation battements", s:90, c:[`Le bourdon tient la fondamentale`,`Chante tierce, quinte, octave : quand c’est parfaitement juste, les battements disparaissent`], tip:`L’intonation des choristes professionnels.`},
-        {t:"Agilité — gammes rapides", s:120, c:[`Gammes rapides sur « a », métronome`,`Lent (« ha-ha-ha ») → legato → accélère d’un cran`]},
-        {t:"Agilité — staccato", s:90, c:[`Notes piquées détachées sur arpège do-mi-sol-do`,`Légères et nettes`]},
-        {t:"Agilité — mélisme", s:90, c:[`Un petit mélisme de ta chanson`,`Lent puis à tempo`]},
-        {t:"Nuances — messa di voce", s:240, c:[`Sur une note tenue : crescendo (doux→fort) puis decrescendo (fort→doux)`,`Hauteur et timbre stables · accordeur allumé · 4-5 notes`], tip:`C’est dur — quelques-unes suffisent.`},
-        {t:"Vibrato — libération", s:120, c:[`Son droit appuyé 5-6 s, puis relâche`,`Laisse le vibrato s’installer seul (5-6 ondulations/s) — ne le fabrique pas`]},
-        {t:"Application répertoire", s:360, c:[`Une chanson entière (ou une grande section)`,`Intègre tout : appui, attaque, mix, ring, nuances`,`AVEC le texte et l’intention`]},
-        {t:"Retour au calme", s:60, c:[`Fredonnement doux descendant`,`Relâche la mâchoire`]},
-      ],
+        {t:"Souffle & appui", s:180, c:[`Respirations basses puis « sssss »`,`Bats ton temps de la semaine dernière`]},
+        {t:"SOVT — paille & lip trills", s:300, c:[`Sirènes guidées, toute l’étendue`,`Facile et fluide`]},
+        {t:"Oreille — mémoire tonale", s:84, c:[`Note → silence → mémoire`,`Sois exigeant sur la vérification`]},
+        {t:"Justesse — gamme 5 notes", s:120, c:[`Appel-réponse`,`Legato, degrés exacts`]},
+        {t:"Justesse — intervalles", s:120, c:[`Arpèges d’octave`,`Tierce et quinte justes`]},
+        {t:"Oreille — justesse descendante", s:80, c:[`Intervalles qui descendent`,`On chante souvent trop bas en descendant`]},
+        {t:"Retour au calme", s:60, c:[`Descentes guidées`,`Volume décroissant`]},
+      ]},
+  3:{ theme:"Résonance de base", accent:"#D99A5B", ink:"#1a1208", boost:{r:0,t:0},
+      obj:"Trouver le « ring » : le buzz à l’avant, la brillance qui porte sans forcer.",
       days:{
-        1:`Installe l’agilité lentement. Précision avant vitesse.`,
-        2:`Installe l’agilité lentement. Précision avant vitesse.`,
-        3:`Enregistre la chanson en entier. C’est ton « après ».`,
-        4:`Monte le tempo des vocalises d’un cran. Travaille la messa di voce.`,
-        5:`Monte le tempo des vocalises d’un cran. Travaille la messa di voce.`,
-        6:`Jour léger.`,
-        7:`Réenregistre la chanson, puis réécoute ton tout premier enregistrement (S1-J3). Compare !`,
-      }},
+        1:"Cherche le buzz du « ng » : lèvres et nez qui vibrent.",
+        2:"Focus « ng→a » : garde la vibration en ouvrant la voyelle.",
+        3:"🎙 Enregistre un « nay nay » — entends-tu la brillance ?",
+        4:"Focus twang : « nay » un peu canard, assumé — c’est le bon geste.",
+        5:"Alterne : une série brillante, une série douce — même placement.",
+        6:"Jour léger : sirènes + « ng » doux uniquement.",
+        7:"🎙 Réenregistre le « nay nay » — compare la projection J3/J7.",
+      },
+      steps:[
+        {t:"Souffle & appui", s:180, c:[`Le rituel d’ouverture`,`Régularité absolue`]},
+        {t:"SOVT — sirènes larges", s:240, c:[`Paille / lip trills en sirènes`,`Traverse tout ton registre sans t’arrêter`]},
+        {t:"Résonance — ng → a", s:120, c:[`Buzz à l’avant puis ouverture`,`Le squillo reste pendant la voyelle`]},
+        {t:"Résonance — nay nay nay", s:100, c:[`« nay » brillant en arpège`,`La brillance qui coupe`]},
+        {t:"Oreille — mémoire mélodique", s:100, c:[`Petites mélodies à retenir`,`Le dessin exact, note à note`]},
+        {t:"Justesse — note tenue (drone)", s:100, c:[`Stabilité contre le bourdon`,`Vibrato libre et régulier`]},
+        {t:"Retour au calme", s:60, c:[`Descentes douces`,`Relâche tout`]},
+      ]},
+  4:{ theme:"Consolidation ① — délestage", accent:"#D99A5B", ink:"#1a1208", boost:{r:-1,t:0},
+      obj:"Semaine allégée : on descend d’un demi-ton, on consolide, on mesure. La voix progresse PENDANT le repos.",
+      days:{
+        1:"Tout un demi-ton plus bas cette semaine : qualité maximale, zéro effort.",
+        2:"Focus VFE : ta première tenue chronométrée — la référence des 3 prochains mois.",
+        3:"🎙 Enregistre gamme + note tenue : le bilan du mois 1.",
+        4:"Séance plaisir : ne valide ✓ que ce qui est vraiment facile.",
+        5:"Focus oreille : la mémoire tonale doit être quasi parfaite maintenant.",
+        6:"Repos quasi total : SOVT 5 min, rien d’autre.",
+        7:"🎙 Bilan du mois : réécoute J3 de S1 vs aujourd’hui. Écris ce qui a changé.",
+      },
+      steps:[
+        {t:"SOVT — paille & lip trills", s:300, c:[`L’échauffement-récupération roi`,`Facilité absolue`]},
+        {t:"VFE 1 — Tenue maximale « i »", s:63, c:[`Chronomètre ta tenue max`,`Ta mesure objective de progrès`]},
+        {t:"Oreille — mémoire tonale", s:84, c:[`Le socle, consolidé`,`Exigence sur la vérification`]},
+        {t:"Justesse — gamme 5 notes", s:120, c:[`Un demi-ton plus bas`,`Perfection tranquille`]},
+        {t:"Résonance — ng → a", s:100, c:[`Le buzz, sans effort`,`Consolide le placement`]},
+        {t:"Retour au calme", s:60, c:[`Descentes guidées`,`Fin de mois en douceur`]},
+      ]},
+  /* ============ MOIS 2 — CONNEXION & REGISTRES ============ */
+  5:{ theme:"Vers le passage", accent:"#6FB3A8", ink:"#0a1f1c", boost:{r:0,t:0},
+      obj:"Apprivoiser le passaggio : le traverser en douceur, sans casser ni pousser.",
+      days:{
+        1:"Repère TA zone de passage : où ça tire ? Note la hauteur.",
+        2:"Focus sirènes ng : traverse le break lentement, plusieurs fois.",
+        3:"🎙 Enregistre un « goug » sur arpège — le passage s’entend-il ?",
+        4:"Focus « goug » : le G ferme, le OU allège — connecté du bas au haut.",
+        5:"Focus voyelle : « i→é » sur les notes hautes désamorce la tension.",
+        6:"Jour léger : sirènes ng douces uniquement.",
+        7:"🎙 Réenregistre le « goug » — le passage se lisse-t-il ?",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Sirènes + ng→a + attaques`,`Six minutes, opérationnel`]},
+        {t:"Oreille — intervalles chantés", s:72, c:[`Deux notes à reproduire`,`L’écart exact`]},
+        {t:"Passaggio — sirènes ng", s:120, c:[`Sirène « ng » à travers le break`,`Transition fluide, pression constante`]},
+        {t:"Passaggio — goug / mum", s:140, c:[`Arpège jusqu’à la 10e`,`Connecté, voile fermé, sans bascule`]},
+        {t:"Modification de voyelle", s:100, c:[`« i→é », « a→ɔ » sur note haute`,`L’aggiustamento désamorce`]},
+        {t:"Retour au calme", s:60, c:[`Descentes relâchées`,`La zone de passage se détend`]},
+      ]},
+  6:{ theme:"Mix", accent:"#6FB3A8", ink:"#0a1f1c", boost:{r:1,t:0},
+      obj:"Construire la voix mixte : ni pleine voix poussée, ni falsetto détimbré — le pont.",
+      days:{
+        1:"Le cuperto d’abord : descends du haut en gardant la légèreté.",
+        2:"Focus sauts d’octave : la note haute posée par au-dessus, légère.",
+        3:"🎙 Enregistre un saut d’octave — la note haute est-elle libre ?",
+        4:"Focus mix : cherche le son qui n’est ni lourd ni soufflé.",
+        5:"Enchaîne cuperto puis goug : le mix descend puis remonte.",
+        6:"Jour léger : cuperto doux + sirènes.",
+        7:"🎙 Réenregistre le saut d’octave — compare la facilité.",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Le rituel`,`Complet et fluide`]},
+        {t:"Oreille — intervalles chantés", s:72, c:[`Sixtes et octaves surtout`,`Les grands écarts`]},
+        {t:"Mix — quintes descendantes cuperto", s:120, c:[`Descends couvert depuis la quinte`,`La légèreté du haut jusqu’en bas`]},
+        {t:"Passaggio — goug / mum", s:140, c:[`Le pont monte`,`Un demi-ton de plus cette semaine`]},
+        {t:"Registres — sauts d'octave", s:120, c:[`« oui-oui » d’octave`,`Mix léger, jamais poussé`]},
+        {t:"Retour au calme", s:60, c:[`Détente complète`,`Le mix se consolide au repos`]},
+      ]},
+  7:{ theme:"Étendue", accent:"#6FB3A8", ink:"#0a1f1c", boost:{r:1,t:0},
+      obj:"Ouvrir l’aigu par la détente : approche descendante et arpèges longs.",
+      days:{
+        1:"L’arpège long : allège à chaque étage en montant.",
+        2:"Focus descente depuis le haut : la note aiguë comme point de DÉPART.",
+        3:"🎙 Enregistre ta note la plus haute PROPRE — le sommet du jour.",
+        4:"Ne monte que ce qui reste facile : ✗ dès que ça tire.",
+        5:"Focus voyelle sur l’aigu : arrondis, couvre, laisse sonner.",
+        6:"Jour léger : sirènes larges douces, pas d’aigu.",
+        7:"🎙 Réenregistre le sommet propre — a-t-il monté ? (Le ✓/✗ te le dit aussi.)",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Complet avant l’aigu`,`Jamais d’aigu à froid`]},
+        {t:"Oreille — justesse descendante", s:80, c:[`Descentes précises`,`Par au-dessus`]},
+        {t:"Étendue — arpège long", s:130, c:[`Octave + quinte`,`Allège en montant`]},
+        {t:"Aigu — descente depuis le haut", s:130, c:[`Attaque la note haute, légère`,`Puis descends — la détente s’installe`]},
+        {t:"Modification de voyelle", s:100, c:[`L’outil de l’aigu`,`La gorge se désamorce`]},
+        {t:"Retour au calme", s:60, c:[`Longues descentes`,`Récupération après l’aigu`]},
+      ]},
+  8:{ theme:"Consolidation ② — délestage", accent:"#6FB3A8", ink:"#0a1f1c", boost:{r:-1,t:0},
+      obj:"Semaine allégée : glissés VFE, passage consolidé, bilan du mois 2.",
+      days:{
+        1:"Un demi-ton plus bas : la facilité comme objectif unique.",
+        2:"Focus VFE glissés : montée ET descente sans aucun trou.",
+        3:"🎙 Enregistre le « goug » — compare avec S5 J3.",
+        4:"Séance courte si besoin : SOVT + VFE suffisent.",
+        5:"Focus oreille : les intervalles doivent être des réflexes.",
+        6:"Repos quasi total : sirènes 5 min.",
+        7:"🎙 Bilan du mois 2 : passage plus lisse ? Étendue élargie ? Écris-le.",
+      },
+      steps:[
+        {t:"SOVT — paille & lip trills", s:300, c:[`Récupération active`,`Douceur totale`]},
+        {t:"VFE 2 — Glissé grave → aigu", s:45, c:[`« knoll » sans trou`,`L’étirement`]},
+        {t:"VFE 3 — Glissé aigu → grave", s:45, c:[`Sans décrocher`,`La contraction`]},
+        {t:"Oreille — intervalles chantés", s:72, c:[`Consolidation`,`Réflexes`]},
+        {t:"Passaggio — goug / mum", s:140, c:[`Plus bas, parfait`,`Le pont est acquis`]},
+        {t:"Retour au calme", s:60, c:[`Fin de mois`,`Détente`]},
+      ]},
+  /* ============ MOIS 3 — TIMBRE & EXPRESSION ============ */
+  9:{ theme:"Voyelles", accent:"#7FB2F0", ink:"#081524", boost:{r:1,t:0},
+      obj:"L’homogénéité : cinq voyelles, un seul timbre. La marque d’une voix travaillée.",
+      days:{
+        1:"Écoute d’abord : tes voyelles sonnent-elles pareil ? Sois honnête.",
+        2:"Focus « i » : souvent pincé — arrondis-le de l’intérieur.",
+        3:"🎙 Enregistre i-é-a-o-ou sur une note — le juge de paix.",
+        4:"Focus « ou » : souvent éteint — garde-le timbré et présent.",
+        5:"Focus battements : l’intonation fine se travaille doux.",
+        6:"Jour léger : voyelles chuchotées-chantées + sirènes.",
+        7:"🎙 Réenregistre les 5 voyelles — plus homogènes ?",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Le rituel`,`Complet`]},
+        {t:"Oreille — intonation battements", s:90, c:[`Bourdon + intervalle à caler`,`La fusion parfaite`]},
+        {t:"Voyelles — égalisation", s:130, c:[`i-é-a-o-ou sur la note`,`Même placement, même volume`]},
+        {t:"Justesse — note tenue (drone)", s:100, c:[`Stabilité renforcée`,`Le vibrato s’égalise`]},
+        {t:"Legato — ligne", s:120, c:[`Gamme lente sur « ou »`,`Comme un archet`]},
+        {t:"Retour au calme", s:60, c:[`Descentes`,`Détente du voile`]},
+      ]},
+  10:{ theme:"Ligne & vibrato", accent:"#7FB2F0", ink:"#081524", boost:{r:1,t:0},
+      obj:"La ligne vivante : legato absolu, portamento maîtrisé, vibrato libéré.",
+      days:{
+        1:"Le portamento : choisis ta vitesse de glissé et TIENS-la.",
+        2:"Focus legato : imagine une seule note dont la hauteur bouge.",
+        3:"🎙 Enregistre une note tenue longue — le vibrato vient-il seul ?",
+        4:"Focus vibrato : son droit appuyé… puis LÂCHE. Ne fabrique rien.",
+        5:"Focus majeur/mineur : la tierce fait la couleur.",
+        6:"Jour léger : portamento doux + fredonnement.",
+        7:"🎙 Réenregistre la tenue — le vibrato est-il plus régulier ?",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Prêt en six minutes`,`L’ordre compte`]},
+        {t:"Legato — portamento contrôlé", s:90, c:[`Glissés lents et réguliers`,`Le trajet est le but`]},
+        {t:"Legato — ligne", s:120, c:[`Le son ne s’interrompt jamais`,`Volume égal`]},
+        {t:"Vibrato — libération", s:130, c:[`Droit puis lâcher`,`5-6 ondulations/s, naturelles`]},
+        {t:"Oreille — majeur / mineur", s:80, c:[`La couleur de la tierce`,`Reproduis-la exactement`]},
+        {t:"Retour au calme", s:60, c:[`Fredonnement libre`,`Laisse vibrer`]},
+      ]},
+  11:{ theme:"Dynamiques", accent:"#7FB2F0", ink:"#081524", boost:{r:2,t:0},
+      obj:"Le contrôle du volume : messa di voce, crescendo en mouvement, pianissimo filé.",
+      days:{
+        1:"La messa di voce est dure : 4-5 belles valent mieux que 10 forcées.",
+        2:"Focus pianissimo : le son le plus doux qui reste timbré ET juste.",
+        3:"🎙 Enregistre une messa di voce — timbre stable du pp au ff ?",
+        4:"Focus crescendo mobile : le volume grandit, le timbre ne durcit JAMAIS.",
+        5:"Alterne pp et f sur la même note : les deux mondes, un seul timbre.",
+        6:"Jour léger : pianissimos doux + sirènes.",
+        7:"🎙 Réenregistre la messa di voce — la maîtrise s’entend.",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Indispensable avant les nuances`,`Complet`]},
+        {t:"Nuances — messa di voce", s:150, c:[`pp→ff→pp`,`Hauteur et timbre immobiles`]},
+        {t:"Nuances — crescendo en mouvement", s:120, c:[`Crescendo sur arpège`,`S’ouvrir sans durcir`]},
+        {t:"Contrôle — tenue pianissimo", s:110, c:[`Le fil de voix`,`Doux, timbré, juste, stable`]},
+        {t:"Oreille — intonation battements", s:90, c:[`Précision d’orfèvre`,`Zéro battement`]},
+        {t:"Retour au calme", s:60, c:[`Descentes pp`,`Tout en douceur`]},
+      ]},
+  12:{ theme:"Consolidation ③ — délestage", accent:"#7FB2F0", ink:"#081524", boost:{r:0,t:0},
+      obj:"Semaine allégée : VFE complet, timbre consolidé, bilan du mois 3.",
+      days:{
+        1:"Retour à la facilité : tout doit couler.",
+        2:"Focus VFE 4 : les cinq tenues chronométrées — compare avec S4.",
+        3:"🎙 Enregistre voyelles + tenue vibrée : le bilan timbre.",
+        4:"Séance plaisir : tes exercices préférés du mois, en douceur.",
+        5:"Focus legato : la ligne est-elle devenue naturelle ?",
+        6:"Repos quasi total : fredonnement 5 min.",
+        7:"🎙 Bilan mois 3 : réécoute S9 J3 vs aujourd’hui. Le timbre a mûri ?",
+      },
+      steps:[
+        {t:"SOVT — paille & lip trills", s:300, c:[`Récupération`,`Douceur`]},
+        {t:"VFE 4 — Cinq tenues maximales", s:240, c:[`Les 5 notes chronométrées`,`Compare tes moyennes`]},
+        {t:"Voyelles — égalisation", s:130, c:[`Consolidation`,`Cinq sœurs`]},
+        {t:"Vibrato — libération", s:130, c:[`Le vibrato s’installe seul`,`Régulier`]},
+        {t:"Retour au calme", s:60, c:[`Fin de mois`,`Sérénité`]},
+      ]},
+  /* ============ MOIS 4 — VIRTUOSITÉ & SCÈNE ============ */
+  13:{ theme:"Agilité", accent:"#E07856", ink:"#240d05", boost:{r:2,t:4},
+      obj:"La vélocité propre : runs, staccato, mélismes — léger, précis, à tempo.",
+      days:{
+        1:"La vitesse vient de la LÉGÈRETÉ : allège avant d’accélérer.",
+        2:"Focus oscillation : gorge libre, seul le pitch bouge.",
+        3:"🎙 Enregistre un run rapide — chaque note s’entend-elle ?",
+        4:"Focus staccato-legato : le contraste révèle tes attaques.",
+        5:"Focus mélisme : lent parfait AVANT rapide.",
+        6:"Jour léger : oscillations douces + sirènes.",
+        7:"🎙 Réenregistre le run — netteté et tempo en hausse ?",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Complet avant la vitesse`,`Toujours`]},
+        {t:"Souplesse — oscillation rapide", s:110, c:[`Pré-trille`,`Détente = vitesse`]},
+        {t:"Agilité — gammes rapides", s:120, c:[`Runs de neuvième`,`Léger, articulé, à tempo`]},
+        {t:"Agilité — staccato", s:110, c:[`Perlé sur la 10e`,`Appui constant`]},
+        {t:"Articulation — staccato-legato", s:130, c:[`Le contraste éducateur`,`Piqué puis lié`]},
+        {t:"Agilité — mélisme", s:120, c:[`Le run pop/gospel`,`Lent puis à tempo`]},
+        {t:"Retour au calme", s:60, c:[`Détente après la vitesse`,`Indispensable`]},
+      ]},
+  14:{ theme:"Puissance saine", accent:"#E07856", ink:"#240d05", boost:{r:2,t:0},
+      obj:"Projeter sans s’abîmer : le call/belt du musical theatre, construit sur 3 mois de fondations.",
+      days:{
+        1:"Le call : « héler un ami, joyeusement ». Vibrant, à l’avant, jamais serré.",
+        2:"Focus tests de sécurité : 10 fois sans fatigue, sourire possible.",
+        3:"🎙 Enregistre un call — puissant ET libre ?",
+        4:"Alterne call et messa di voce : la puissance ET le contrôle.",
+        5:"Focus octaves : la puissance vient de la résonance, pas de la pression.",
+        6:"Jour léger OBLIGATOIRE : sirènes douces, zéro puissance.",
+        7:"🎙 Réenregistre le call — et vérifie ta voix du lendemain : zéro voilement.",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Non négociable avant la puissance`,`Complet`]},
+        {t:"Puissance — mix appuyé (call)", s:120, c:[`« hey » projeté`,`Twang + appui, jamais serré`]},
+        {t:"Résonance — nay nay nay", s:100, c:[`Le squillo au service du call`,`Brillance qui porte`]},
+        {t:"Registres — sauts d'octave", s:120, c:[`La note haute libre`,`Même en puissance`]},
+        {t:"Nuances — messa di voce", s:150, c:[`Le contrepoids du call`,`Contrôle total`]},
+        {t:"Retour au calme", s:60, c:[`Récupération sérieuse`,`Après la puissance, la douceur`]},
+      ]},
+  15:{ theme:"Répertoire intégré", accent:"#E07856", ink:"#240d05", boost:{r:2,t:0},
+      obj:"La technique au service de TES chansons : mélismes, diction, passages travaillés en contexte.",
+      days:{
+        1:"Choisis LA chanson du moment : tout converge vers elle cette semaine.",
+        2:"Focus diction : on doit comprendre chaque mot, même en montant.",
+        3:"🎙 Enregistre un couplet entier — technique + texte + intention.",
+        4:"Isole le passage le plus dur : lent, puis à tempo, puis en contexte.",
+        5:"Focus mélodie : apprends 4 mesures d’oreille (mémoire mélodique).",
+        6:"Jour léger : chante la chanson EN fredonnant (ng) intégral.",
+        7:"🎙 Réenregistre le couplet — compare, note les 2 points à travailler.",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Prêt à chanter`,`Le rituel`]},
+        {t:"Oreille — mémoire mélodique", s:100, c:[`Apprends d’oreille`,`Le dessin exact`]},
+        {t:"Agilité — mélisme", s:120, c:[`Les runs de tes chansons`,`Propres à tempo`]},
+        {t:"Diction — patter chanté", s:120, c:[`Consonnes nettes, mâchoire libre`,`Même en montant`]},
+        {t:"Application répertoire", s:300, c:[`Ta chanson, en entier ou par sections`,`Technique + texte + intention`]},
+        {t:"Retour au calme", s:60, c:[`Descentes`,`La chanson se dépose`]},
+      ]},
+  16:{ theme:"Performance — bilan", accent:"#E07856", ink:"#240d05", boost:{r:3,t:4},
+      obj:"La semaine sommet : tout mélangé, endurance réelle, et le bilan des 4 mois.",
+      days:{
+        1:"Pratique variable : chaque exercice une seule fois, parfait du premier coup.",
+        2:"Focus endurance : les phrases longues, budget d’air maîtrisé.",
+        3:"🎙 Enregistre ta chanson-bilan EN ENTIER — la performance.",
+        4:"Rejoue les exercices du mois 1 : mesure le chemin parcouru.",
+        5:"Focus scène : chante debout, en mouvement, avec intention.",
+        6:"Repos avant le bilan : sirènes 5 min, confiance.",
+        7:"🎙 LE BILAN : réécoute S1 J3 puis aujourd’hui. Écris tes 3 victoires — puis lance le cycle suivant.",
+      },
+      steps:[
+        {t:"Échauffement express", s:240, c:[`Comme avant un spectacle`,`Rituel complet`]},
+        {t:"Endurance — phrase longue", s:120, c:[`Toute la gamme, une respiration`,`Budget d’air`]},
+        {t:"Puissance — mix appuyé (call)", s:120, c:[`La projection acquise`,`Libre et sain`]},
+        {t:"Oreille — intonation battements", s:90, c:[`La précision finale`,`Fusion parfaite`]},
+        {t:"Application répertoire", s:300, c:[`Ta performance`,`Tout intégré : c’est un concert`]},
+        {t:"Retour au calme", s:60, c:[`Descentes`,`Fierté tranquille`]},
+      ]},
 };
 const REC_DAYS = [3,7];
 // Un seul point d'attention par séance — principe pédagogique clé
@@ -589,11 +846,17 @@ function renderHome(){
   const wk=WEEKS[S.week]; setAccent(wk.accent,wk.ink);
   const dur=wk.steps.reduce((a,s)=>a+S.prepSecs+exDurMs(s)/1000,0);
   const isRec=REC_DAYS.includes(S.day), isRest=REST_DAYS.includes(S.day);
+  const mo=monthOf(S.week);
 
-  const weekCards=Object.keys(WEEKS).map(n=>{
+  const monthChips=MONTHS.map(m=>`
+    <button class="month ${m.n===mo.n?'sel':''}" data-m="${m.n}" style="${m.n===mo.n?`--accent:${m.accent}`:''}">
+      <span class="mi">${m.icon}</span><span class="mn">Mois ${m.n}</span><small>${m.name}</small></button>`).join("");
+
+  const weekCards=mo.weeks.map(n=>{
     const w=WEEKS[n];
+    const deload=w.theme.includes("Consolidation");
     return `<button class="week ${n==S.week?'sel':''}" data-week="${n}" style="${n==S.week?`--accent:${w.accent}`:''}">
-      <div class="wk">SEM ${n}</div><div class="nm">${w.theme}</div></button>`;
+      <div class="wk">SEM ${n}${deload?' · 🌿':''}</div><div class="nm">${w.theme.replace(/ — délestage/,'')}</div></button>`;
   }).join("");
 
   const dayChips=[1,2,3,4,5,6,7].map(d=>{
@@ -602,17 +865,23 @@ function renderHome(){
     return `<button class="day ${d==S.day?'sel':''} ${rest?'rest':''}" data-day="${d}">${mark}<span>${d}</span><small>J${d}</small></button>`;
   }).join("");
 
+  const totalDays=(S.week-1)*7+S.day, pct=Math.round(100*totalDays/112);
+
   app.className="fade";
   app.innerHTML=`
     <div class="topbar">
-      <div><div class="wordmark">VOIX</div><div class="tagline">ton coach vocal · 3 semaines</div></div>
+      <div><div class="wordmark">VOIX</div><div class="tagline">programme 16 semaines · jour ${totalDays}/112</div></div>
       <div style="display:flex;gap:8px">
         <button class="ghost-btn tools-trigger" id="openToolsTop" aria-label="Outils">🎛</button>
         <button class="ghost-btn" id="goProg">📈 Progrès</button>
       </div>
     </div>
+    <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
 
-    <div class="eyebrow">Choisis ta semaine</div>
+    <div class="eyebrow">Mois</div>
+    <div class="months">${monthChips}</div>
+
+    <div class="eyebrow">Semaine</div>
     <div class="weeks">${weekCards}</div>
     <div class="obj">${esc(wk.obj)}</div>
 
@@ -665,6 +934,7 @@ function renderHome(){
     </div>
   `;
 
+  app.querySelectorAll(".month").forEach(b=>b.onclick=()=>{ const m=MONTHS.find(x=>x.n==+b.dataset.m); S.week=m.weeks.includes(S.week)?S.week:m.weeks[0]; savePrefs(); renderHome(); });
   app.querySelectorAll(".week").forEach(b=>b.onclick=()=>{ S.week=+b.dataset.week; savePrefs(); renderHome(); });
   app.querySelectorAll(".day").forEach(b=>b.onclick=()=>{ S.day=+b.dataset.day; savePrefs(); renderHome(); });
   app.querySelectorAll("#prepOpts button").forEach(b=>b.onclick=()=>{ S.prepSecs=+b.dataset.p; savePrefs(); renderHome(); });
@@ -1116,7 +1386,7 @@ function renderEnd(){
     <div class="done-sub">${label} · ${Math.round(dur/60)} min</div>
     ${S.sessTop!=null?`<div class="done-top">🏔 Sommet validé aujourd’hui : <b>${midiName(S.sessTop)}</b></div>`:""}
     ${S.vfeHolds.length?`<div class="done-top">⏱ Meilleure tenue VFE : <b>${Math.max(...S.vfeHolds).toFixed(1)} s</b></div>`:""}
-    ${(S.mode==="week"&&S.week===3&&S.day===7)?`<div class="cycle-done">🎉 Cycle ${S.cycle} terminé ! <button class="pill on" id="nextCycle">Démarrer le cycle ${S.cycle+1} →</button></div>`:""}
+    ${(S.mode==="week"&&S.week===16&&S.day===7)?`<div class="cycle-done">🎉 Cycle ${S.cycle} terminé ! <button class="pill on" id="nextCycle">Démarrer le cycle ${S.cycle+1} →</button></div>`:""}
 
     <div class="card">
       <div class="field">
@@ -1141,6 +1411,7 @@ function renderEnd(){
 
     <div class="spacer"></div>
     <button class="cta" id="save">Enregistrer la séance</button>
+    ${S.mode==="week"&&!(S.week===16&&S.day===7)?`<button class="cta-2" id="nextDay">→ Passer au jour suivant</button>`:""}
     <button class="cta-2" id="skip">Passer sans enregistrer</button>
   `;
   app.querySelector("#minus").onclick=()=>{ S.form.sssss=Math.max(0,S.form.sssss-1); document.getElementById("ssVal").textContent=S.form.sssss; };
@@ -1152,7 +1423,9 @@ function renderEnd(){
   app.querySelector("#note").oninput=e=>S.form.note=e.target.value;
   const nc=app.querySelector("#nextCycle");
   if(nc) nc.onclick=()=>{ S.cycle=Math.min(9,S.cycle+1); S.week=1; S.day=1; savePrefs(); renderHome(); };
-  app.querySelector("#save").onclick=async()=>{
+  const nd=app.querySelector("#nextDay");
+  if(nd) nd.onclick=async()=>{ await doSave(); if(S.day<7) S.day++; else { S.day=1; S.week=Math.min(16,S.week+1); } savePrefs(); renderHome(); };
+  async function doSave(){
     const prevBest=S.logs.reduce((m,l)=>Math.max(m,l.sssss||0),0);
     S.logs.unshift({ date:todayKey(), ts:Date.now(),
       mode:S.mode, week:S.mode==="week"?S.week:null, day:S.mode==="week"?S.day:null,
@@ -1163,8 +1436,8 @@ function renderEnd(){
     const goalHit = v>=S.goal;
     S._celebrate = (record||goalHit) ? {record, goal:goalHit, value:v} : null;
     await Store.setJSON(K_LOGS,S.logs);
-    renderProgress();
-  };
+  }
+  app.querySelector("#save").onclick=async()=>{ await doSave(); renderProgress(); };
   app.querySelector("#skip").onclick=()=>renderHome();
 }
 
@@ -1520,12 +1793,19 @@ const PATTERNS={
   scaleOct:[0,2,4,5,7,9,11,12,11,9,7,5,4,2,0],
   scale9:[0,2,4,5,7,9,11,12,14,12,11,9,7,5,4,2,0], // gamme jusqu'à la 9e
   melisma:[7,5,4,2,0,4,2,0],              // run descendant orné (riff pop/gospel)
+  octLeap:[0,12,0,12,0],                  // sauts d'octave
+  arpLong:[0,4,7,12,16,19,16,12,7,4,0],   // arpège octave+quinte (1,5 octave)
+  descTop:[12,11,9,7,5,4,2,0],            // descente depuis la note haute
+  osc:[0,2,0,2,0,2,0],                    // oscillation rapide (pré-trille)
+  cuperto:[7,5,4,2,0],                    // quintes descendantes couvertes
+  callUp:[0,7,7,7,0],                     // appel projeté sur la quinte
 };
 // ---- SYSTÈME DE PHASES : appel-réponse (écoute → à toi) + sous-étapes + sirènes guidées ----
 // Niveau : "std" (confirmé) / "adv" (avancé : plus haut, plus de répétitions, plus rapide)
-function lvRoot(){ return (S.level==="adv"?2:0) + Math.min(S.cycle-1,4); }
+function wkBoost(){ const w=WEEKS[S.week]; return (S.mode==="week"&&w&&w.boost)?w.boost:{r:0,t:0}; }
+function lvRoot(){ return (S.level==="adv"?2:0) + Math.min(S.cycle-1,4) + wkBoost().r; }
 function lvRounds(){ return S.level==="adv"?2:0; }
-function lvTempo(){ return (S.level==="adv"?1.1:1) * (1+.03*Math.min(S.cycle-1,4)); }
+function lvTempo(){ return (S.level==="adv"?1.1:1) * (1+.03*Math.min(S.cycle-1,4)) * (1+.01*Math.max(0,wkBoost().t)); }
 function patDur(patName, tempo){
   const pat=PATTERNS[patName]||[0]; const beat=60/(tempo||90);
   return pat.length*beat + .3;
@@ -1600,6 +1880,56 @@ const SPEC={
     {mode:"do",sec:45,chrono:true,note:n,label:"« ol » tenu au MAXIMUM — chronomètre, puis note suivante"},
   ])},
   "Réveil — sirènes":{f:"seq",phases:[{mode:"siren",guide:[43,62],sec:90,label:"Paille ou lip trills — suis la sirène, réveille toute l’étendue sans forcer"}]},
+  /* — Migrés depuis les steps (réutilisables) — */
+  "Souffle & appui":{f:"seq",phases:[
+    {mode:"do",sec:40,label:"Appoggio : 4 respirations basses costo-diaphragmatiques — épaules immobiles, soutien bas"},
+    {mode:"do",sec:140,label:"« sssss » d'appui : débit d'air constant, le plus long possible (1 inspiration = 1 sss)"}]},
+  "SOVT — paille & lip trills":{f:"seq",phases:[
+    {mode:"siren",guide:[45,60],sec:120,label:"Paille dans l'eau — suis la sirène, contre-pression régulière"},
+    {mode:"siren",guide:[43,62],sec:120,label:"Lip trills « brrr » — suis la sirène sur toute l'étendue"},
+    {mode:"siren",guide:[48,60],sec:60,label:"« ng » fermé — suis la sirène, buzz à l'avant constant"}]},
+  "Échauffement express":{f:"seq",phases:[
+    {mode:"siren",guide:[43,62],sec:120,label:"Paille / lip trills en sirènes — réveille l'émission sur toute l'étendue"},
+    {mode:"do",sec:60,label:"« ng → a » : buzz à l'avant puis ouvre, en montant par demi-tons"},
+    {mode:"do",sec:60,label:"Quelques attaques « é » nettes dans le médium-aigu"}]},
+  /* — Bibliothèque avancée (mois 2-4) — */
+  "Registres — sauts d'octave":{f:"mel",pat:"octLeap",root:48,rounds:6,tempo:80,singLabel:"Octaves « oui-oui » : la note haute en mix léger, SANS pousser — même colonne d'air"},
+  "Étendue — arpège long":{f:"mel",pat:"arpLong",root:48,rounds:5,tempo:104,singLabel:"Arpège d'octave+quinte : allège en montant, ancre le soutien en bas"},
+  "Aigu — descente depuis le haut":{f:"mel",pat:"descTop",root:53,rounds:6,tempo:96,singLabel:"Attaque directement la note HAUTE, légère, puis descends — l'aigu s'installe par la détente"},
+  "Souplesse — oscillation rapide":{f:"mel",pat:"osc",root:53,rounds:6,tempo:150,singLabel:"Oscille entre les 2 notes, gorge libre — prépare trille et vibrato"},
+  "Mix — quintes descendantes cuperto":{f:"mel",pat:"cuperto",root:57,rounds:6,tempo:88,singLabel:"« ou » couvert depuis la quinte : descends en gardant la légèreté du haut jusqu'en bas"},
+  "Legato — portamento contrôlé":{f:"seq",phases:[
+    {mode:"siren",dir:"up",guide:[50,57],sec:45,label:"Glisse LENTEMENT de la note grave à la quinte sur « ou » — le trajet est le but, aucun palier"},
+    {mode:"siren",dir:"down",guide:[50,57],sec:45,label:"Même trajet en descendant — vitesse constante, timbre égal"}]},
+  "Articulation — staccato-legato":{f:"fn",make:()=>[
+    ...crMel("arpUpDown",52+lvRoot(),2,{tempo:Math.round(120*lvTempo()),art:"staccato",singLabel:"Piqué : chaque note détachée, appui constant"}),
+    ...crMel("arpUpDown",54+lvRoot(),2,{tempo:Math.round(120*lvTempo()),singLabel:"MÊME arpège lié : aucun trou — le contraste éduque l'attaque"}),
+    ...crMel("arpUpDown",56+lvRoot(),2,{tempo:Math.round(126*lvTempo()),art:"staccato",singLabel:"Piqué à nouveau, un ton plus haut, toujours léger"}),
+  ]},
+  "Nuances — crescendo en mouvement":{f:"mel",pat:"arpUpDown",root:53,rounds:5,tempo:76,singLabel:"Arpège en crescendo continu pp→f puis retour — le volume grandit SANS durcir le timbre"},
+  "Contrôle — tenue pianissimo":{f:"sus",root:55,rounds:4,holdSec:10,listenLabel:"La note — cible",singLabel:"Fil de voix pp : le son le plus doux qui reste timbré et juste — contrôle ultime du souffle"},
+  "Endurance — phrase longue":{f:"mel",pat:"scale9",root:50,rounds:4,tempo:66,singLabel:"Toute la gamme sur UNE respiration, legato, volume égal — gère ton air jusqu'au bout"},
+  "Puissance — mix appuyé (call)":{f:"mel",pat:"callUp",root:55,rounds:5,tempo:96,singLabel:"« hey » projeté : twang + appui, comme un appel joyeux — puissant mais JAMAIS serré (musical theatre)"},
+  "Diction — patter chanté":{f:"seq",phases:[
+    {mode:"do",sec:60,label:"Sur UNE note confortable : parle-chante un texte de ta chanson, consonnes ultra-nettes, mâchoire libre"},
+    {mode:"do",sec:60,label:"Même texte, 2 demi-tons plus haut — la diction reste aussi nette quand ça monte"}]},
+  /* — Oreille avancée — */
+  "Oreille — mémoire mélodique":{f:"fn",make:()=>[[0,4,2],[0,5,4],[0,2,4,7],[0,7,5,4],[0,4,7,12]].map((sq,k)=>({sq,r:50+lvRoot()+(k%3)})).flatMap(({sq,r})=>[
+    {mode:"listen",sec:Math.max(4,sq.length+2),play:{seq:sq,root:r,tempo:76},note:r,label:"Écoute la petite mélodie — mémorise le dessin"},
+    {mode:"do",sec:3,label:"Silence — rejoue-la dans ta tête"},
+    {mode:"sing",sec:Math.max(5,sq.length+2),note:r,label:"Chante-la de mémoire, notes exactes"},
+    {mode:"listen",sec:Math.max(4,sq.length+2),play:{seq:sq,root:r,tempo:76},note:r,label:"Vérification"},
+  ])},
+  "Oreille — justesse descendante":{f:"fn",make:()=>[[0,-2],[0,-4],[0,-5],[0,-7],[0,-12]].map((sq,k)=>({sq,r:60+lvRoot()-(k%2)})).flatMap(({sq,r})=>[
+    {mode:"listen",sec:4,play:{seq:sq,root:r,tempo:66},note:r,label:"Deux notes qui DESCENDENT — écoute l'écart"},
+    {mode:"sing",sec:5,play:{seq:sq,root:r,tempo:66},note:r,ref:true,label:"Reproduis en descendant — on chante souvent trop bas : vise juste"},
+    {mode:"listen",sec:3,play:{seq:sq,root:r,tempo:66},note:r,label:"Vérification"},
+  ])},
+  "Oreille — majeur / mineur":{f:"fn",make:()=>[[0,4,7],[0,3,7],[0,4,7],[0,3,7],[0,3,7],[0,4,7]].map((sq,k)=>({sq,r:50+lvRoot()+(k%3)})).flatMap(({sq,r})=>[
+    {mode:"listen",sec:4,play:{seq:sq,root:r,tempo:80},note:r,label:"Arpège — majeur (lumineux) ou mineur (sombre) ? La tierce décide"},
+    {mode:"sing",sec:5,play:{seq:sq,root:r,tempo:80},note:r,ref:true,label:"Reproduis l'arpège avec SA tierce exacte"},
+    {mode:"listen",sec:3,play:{seq:sq,root:r,tempo:80},note:r,label:"Vérification"},
+  ])},
   "SOVT — sirènes larges":{f:"seq",phases:[{mode:"siren",guide:[40,64],sec:240,label:"Sirène large (paille ou lip) — traverse les deux passaggi sans accroc ni rupture"}]},
   "Passaggio — sirènes ng":{f:"seq",phases:[{mode:"siren",guide:[48,64],sec:120,label:"Sirène « ng » à travers le passaggio — transition fluide, pression d'air constante"}]},
   "SOVT — paille":{f:"seq",phases:[{mode:"siren",guide:[43,60],sec:240,label:"Paille dans l'eau — suis la sirène, débit d'air régulier, contre-pression stable"}]},
@@ -1750,6 +2080,98 @@ function markPlaying(dur){
    « COMMENT FAIRE ? » — explications détaillées par étape
    ========================================================= */
 const HOW={
+  "Registres — sauts d'octave":[
+    "Le saut d'octave force ton système à changer de configuration (grave→aigu) instantanément — c'est l'exercice roi de la coordination des registres.",
+    "Sur « oui-oui » : la note basse ancrée, puis la note haute en mix LÉGER, comme si tu la posais par au-dessus. Même colonne d'air, zéro poussée.",
+    "Piège : prendre de l'élan avec le volume pour « atteindre » le haut. Non : c'est un basculement de configuration, pas un effort. Léger = réussi.",
+    "Si la note haute craque ou tire : ✗, redescends. La propreté du saut compte plus que sa hauteur.",
+  ],
+  "Étendue — arpège long":[
+    "Une octave et demie dans un seul geste : cet arpège t'apprend à ALLÉGER progressivement en montant — la clé mécanique de l'aigu.",
+    "Pense « moins de poids » à chaque étage : le bas est riche et ancré, le sommet est fin et libre. Le soutien, lui, reste constant.",
+    "La descente est aussi importante : reprends du corps progressivement, sans t'effondrer sur les dernières notes.",
+  ],
+  "Aigu — descente depuis le haut":[
+    "Approche « top-down » : au lieu de monter VERS l'aigu (et d'empiler les tensions en chemin), tu attaques directement la note haute, légère, puis tu descends.",
+    "L'attaque du haut se fait en mix doux, presque parlé-aigu, sans préparation musculaire. Puis la descente installe cette détente dans tout le registre.",
+    "C'est la méthode des pédagogues pour désamorcer la peur de l'aigu : la note haute devient un point de départ, pas un sommet à conquérir.",
+    "Si la première note sort serrée : ✗, plus bas. Elle doit sortir facile ou ne pas sortir du tout.",
+  ],
+  "Souplesse — oscillation rapide":[
+    "L'oscillation rapide entre deux notes voisines assouplit le mécanisme d'accord des cordes — c'est le précurseur du trille et un excellent libérateur de vibrato.",
+    "Gorge et mâchoire totalement libres : seul le « pitch » bouge, rien d'autre. Si la mâchoire tremble, ralentis.",
+    "Commence en laissant l'oscillation un peu floue, puis précise les deux hauteurs. La vitesse vient de la détente, jamais de l'effort.",
+  ],
+  "Mix — quintes descendantes cuperto":[
+    "Le « cuperto » : descendre depuis le haut en gardant la configuration LÉGÈRE du haut, sur « ou » couvert. C'est ainsi qu'on tisse le mix vers le bas.",
+    "Départ sur la quinte, en voix fine et couverte (lèvres arrondies, espace intérieur haut). En descendant, RÉSISTE à l'envie de « rebrancher » la pleine voix : garde le fil léger jusqu'en bas.",
+    "Résultat recherché : plus de rupture entre tes registres — le haut et le bas parlent la même langue.",
+  ],
+  "Legato — portamento contrôlé":[
+    "Le portamento est un glissé EXPRESSIF et contrôlé entre deux notes précises — l'outil des grands interprètes pour lier sans ramollir.",
+    "Suis la sirène lente : le trajet doit être parfaitement régulier (pas d'accélération à l'arrivée) et le timbre identique du début à la fin.",
+    "Différence avec un glissé paresseux : ici tu choisis la vitesse et tu la tiens. C'est du legato de précision.",
+  ],
+  "Articulation — staccato-legato":[
+    "Alterner piqué et lié sur le MÊME motif éduque ton attaque : le staccato vérifie la précision de fermeture, le legato vérifie la continuité du souffle.",
+    "En staccato : chaque note naît et meurt proprement, le soutien reste engagé ENTRE les notes (c'est lui qui rebondit, pas la gorge).",
+    "En legato : exactement les mêmes hauteurs, mais plus aucune interruption. Le contraste immédiat révèle tes défauts d'attaque mieux que n'importe quel exercice isolé.",
+  ],
+  "Nuances — crescendo en mouvement":[
+    "Faire un crescendo sur une note tenue, c'est déjà exigeant. Le faire PENDANT que la hauteur bouge, c'est le niveau supérieur : dissocier volume et hauteur.",
+    "Sur l'arpège lent : démarre pp, grandis continûment jusqu'au sommet, redescends en decrescendo. Le piège mortel : monter en volume ↔ durcir le timbre. Le timbre ne change JAMAIS.",
+    "Si le sommet sort poussé : ✗. Un crescendo réussi donne l'impression que le son « s'ouvre », pas qu'il force.",
+  ],
+  "Contrôle — tenue pianissimo":[
+    "Chanter fort est facile. Chanter PIANISSIMO juste et timbré est la vraie preuve de contrôle — c'est le « fil de voix » (filar il suono) du bel canto.",
+    "Le son le plus doux possible qui reste : timbré (pas soufflé), juste (pas détimbré vers le bas), stable (pas tremblant). Les trois à la fois.",
+    "Le secret : le soutien reste AUSSI actif qu'en forte — c'est le débit d'air qui diminue, pas l'engagement. Si le son devient aérien : trop de fuite, referme doucement.",
+  ],
+  "Endurance — phrase longue":[
+    "Les phrases de chanson font 8-15 secondes : cet exercice construit l'endurance RÉELLE — toute la gamme lente sur une seule respiration.",
+    "Planifie ton air comme un budget : dépense peu au début (on gaspille toujours au départ), garde de la réserve pour la remontée finale.",
+    "Volume égal du premier au dernier son. Si tu finis en apnée écrasée : pars moins fort. La régularité prime sur la puissance.",
+  ],
+  "Puissance — mix appuyé (call)":[
+    "Le « call » — l'appel projeté — est la porte d'entrée saine vers le belt du musical theatre : puissant, brillant, mais construit sur le twang et l'appui, JAMAIS sur le serrage.",
+    "Pense « héler un ami de l'autre côté de la rue, joyeusement » : « hey ! » clair, énergique, qui porte. La sensation est vibrante et à l'avant, pas dans la gorge.",
+    "Tests de sécurité : tu peux le refaire 10 fois sans fatigue ; tu peux sourire en le faisant ; le lendemain, zéro voilement. Si un test échoue : ✗ et plus bas.",
+    "Après 3 mois de fondations, ta voix est prête pour ça — mais la règle d'or demeure : puissance = résonance + appui, jamais pression.",
+  ],
+  "Diction — patter chanté":[
+    "Au théâtre musical, on te comprend ou tu n'existes pas. Le patter (parlé-chanté rapide) muscle la diction SANS sacrifier l'émission.",
+    "Sur une note tenue confortable : débite ton texte avec des consonnes exagérément nettes, mâchoire souple, lèvres actives. La voyelle reste chantée, timbrée.",
+    "Puis 2 demi-tons plus haut : c'est là que la diction s'effondre d'habitude (la mâchoire se fige en montant). Garde-la libre.",
+  ],
+  "Oreille — mémoire mélodique":[
+    "Après la note seule (mémoire tonale), la mélodie : retenir un DESSIN de 3-4 notes et le restituer exactement — la compétence d'apprentissage de répertoire.",
+    "Pendant le silence, rejoue la mélodie dans ta tête avec les hauteurs précises (pas juste le contour « ça monte-ça descend »).",
+    "La vérification est ton professeur : compare note à note. Les erreurs typiques : écraser les petits intervalles, exagérer les grands.",
+  ],
+  "Oreille — justesse descendante":[
+    "Fait documenté : on chante plus souvent FAUX en descendant qu'en montant (on « laisse tomber » sous la note). Cet exercice cible exactement ça.",
+    "Sur chaque intervalle descendant : vise la note d'arrivée PAR AU-DESSUS, comme si tu la posais délicatement — jamais en glissant dessous.",
+    "Garde le soutien actif en descendant : la descente n'est pas un relâchement, c'est un placement.",
+  ],
+  "Oreille — majeur / mineur":[
+    "La tierce fait la couleur : majeure = lumineux, mineure = sombre. Distinguer et REPRODUIRE cette différence d'un demi-ton est un raffinement d'oreille décisif.",
+    "Écoute d'abord la couleur globale, puis chante l'arpège avec SA tierce exacte. L'erreur classique : chanter majeur par habitude quand c'est mineur.",
+    "Astuce d'ancrage : majeur = « Joyeux anniversaire », mineur = « Dans la forêt lointaine » assombrie. Associe des références personnelles.",
+  ],
+  "Souffle & appui":[
+    "Le socle de tout : la respiration costo-diaphragmatique et l'appui (appoggio) — un débit d'air constant et maîtrisé.",
+    "Phase 1 : quatre respirations basses, mains sur les côtes flottantes — elles s'écartent à l'inspiration, les épaules ne bougent JAMAIS.",
+    "Phase 2 : « sssss » long — le sablier de ton souffle. Régulier du début à la fin : ni faiblard, ni qui s'emballe. Note ton meilleur temps en fin de séance.",
+  ],
+  "SOVT — paille & lip trills":[
+    "Les exercices à tractus semi-occlus (SOVT — Titze) : la contre-pression de la paille ou des lèvres équilibre la pression sous-glottique et fait vibrer les cordes avec un minimum d'effort.",
+    "C'est ton échauffement ET ta récupération : impossible de mal faire si ça reste FACILE. Le jour où c'est laborieux, c'est que tu pousses.",
+    "Suis les sirènes sur toute l'étendue : le SOVT te fait traverser les zones de rupture en douceur, sans que le larynx panique.",
+  ],
+  "Échauffement express":[
+    "La version condensée de l'échauffement complet : sirènes SOVT, puis résonance « ng→a », puis quelques attaques nettes. Six minutes pour être opérationnel.",
+    "L'ordre compte : d'abord le flux (sirènes), puis le placement (ng), puis la précision (attaques). Ne saute pas d'étape.",
+  ],
   "Oreille — mémoire tonale":[
     "On ne chante juste que ce qu’on entend précisément — et la précision se joue dans la mémoire tonale : garder une hauteur exacte en tête, sans support.",
     "Le piano joue une note (3 s), puis SILENCE (3 s) : pendant ce silence, « entends » la note dans ta tête, comme si elle sonnait encore. Puis chante-la.",
@@ -1962,7 +2384,7 @@ async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.we
   const prefs=await Store.getJSON(K_PREFS,{});
   if(prefs && typeof prefs==="object"){
     if(typeof prefs.muted==="boolean") S.muted=prefs.muted;
-    if(prefs.week>=1&&prefs.week<=3) S.week=prefs.week;
+    if(prefs.week>=1&&prefs.week<=16) S.week=prefs.week;
     if(prefs.day>=1&&prefs.day<=7) S.day=prefs.day;
     if([3,5,8].includes(prefs.prepSecs)) S.prepSecs=prefs.prepSecs;
     if(prefs.level==="adv"||prefs.level==="std") S.level=prefs.level;
