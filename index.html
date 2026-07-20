@@ -343,6 +343,11 @@
   .prep-lbl small{display:block;font-size:.68rem;color:var(--muted-2);font-weight:500}
   .cycle-done{margin:12px auto 4px;text-align:center;font-weight:700}
   .cycle-done .pill{margin-top:8px}
+  .data-row{display:flex;gap:8px;flex-wrap:wrap}
+  .data-btn{flex:1;min-width:100px;padding:11px 8px;border-radius:12px;border:1px solid var(--border);
+    background:var(--surface-2);color:var(--ink);font-weight:700;font-size:.8rem;transition:transform .08s}
+  .data-btn:active{transform:scale(.96)}
+  .data-hint{margin-top:10px;font-size:.75rem;color:var(--muted-2);line-height:1.5}
 
   /* « Comment faire ? » */
   .how-btn{display:block;margin:10px auto 0;padding:7px 15px;border-radius:999px;background:var(--surface);
@@ -782,30 +787,11 @@ const K_LOGS="voix:logs:v1", K_PREFS="voix:prefs:v1", K_TOPS="voix:tops:v1";
    ========================================================= */
 let AC=null;
 function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ AC=null; } } if(AC&&AC.state==="suspended") AC.resume(); return AC; }
-/* Chaîne maître : gain d'amplification (×1 → ×3) suivi d'un limiteur qui bloque la saturation.
-   Toutes les sources sonores (piano, bourdon, sirènes, métronome, bips) passent par ici. */
-let MASTER=null;
-function master(){
-  const c=audio(); if(!c) return null;
-  if(!MASTER){
-    const lim=c.createDynamicsCompressor();
-    lim.threshold.value=-1.5; lim.knee.value=0; lim.ratio.value=20; lim.attack.value=.001; lim.release.value=.10;
-    MASTER=c.createGain(); MASTER.gain.value=S.boost||1;
-    MASTER.connect(lim); lim.connect(c.destination);
-  }
-  return MASTER;
-}
-function setBoost(v){
-  S.boost=Math.min(3,Math.max(1,Math.round(v*10)/10));
-  if(MASTER&&AC) MASTER.gain.setTargetAtTime(S.boost,AC.currentTime,.03);
-  savePrefs();
-  return S.boost;
-}
 function tone(freq,start,dur,gain){
   const c=audio(); if(!c||S.muted) return;
   const o=c.createOscillator(), g=c.createGain();
   o.type="sine"; o.frequency.value=freq;
-  o.connect(g); g.connect(master());
+  o.connect(g); g.connect(c.destination);
   const t=c.currentTime+start;
   g.gain.setValueAtTime(0,t);
   g.gain.linearRampToValueAtTime(gain,t+.02);
@@ -832,7 +818,7 @@ if(REDUCE) document.documentElement.classList.add("reduce");
 const S = {
   screen:"home", week:1, day:1, mode:"week",
   steps:[], idx:0, phases:[], pidx:0, tr:0, trAuto:0, phase:"prep", prepMs:0, prepSecs:5, remMs:0, running:false, endAt:0,
-  muted:false, boost:1, goal:30, logs:[], _celebrate:null, level:"std", cycle:1, tops:{}, sessTop:null, vfeHolds:[],
+  muted:false, goal:30, logs:[], _celebrate:null, level:"std", cycle:1, tops:{}, sessTop:null, vfeHolds:[],
   form:{sssss:20, sens:4, note:""},
 };
 const app=document.getElementById("app");
@@ -861,7 +847,7 @@ function todayKey(){ const d=new Date(); return d.toISOString().slice(0,10); }
 function hasTodayLog(){ return S.logs.some(l=>l.date===todayKey()); }
 
 function renderHome(){
-  S.screen="home"; unlockScreen();
+  S.screen="home"; S.mode="week"; unlockScreen();
   const wk=WEEKS[S.week]; setAccent(wk.accent,wk.ink);
   const dur=wk.steps.reduce((a,s)=>a+S.prepSecs+exDurMs(s)/1000,0);
   const isRec=REC_DAYS.includes(S.day), isRest=REST_DAYS.includes(S.day);
@@ -980,7 +966,7 @@ function startSession(mode){
   const src = modeSrc(mode);
   setAccent(src.accent,src.ink);
   S.steps=src.steps; S.running=true; S.screen="session";
-  S.idx=0; S.tr=0; S.trAuto=0; S.sessTop=null; S.vfeHolds=[]; S.phases=buildPhases(S.steps[0]); S.pidx=0;
+  S.idx=0; S.tr=0; S.trAuto=0; S.sessTop=null; S.vfeHolds=[]; S.rateOkN=0; S.rateKoN=0; S.koEx={}; S.phases=buildPhases(S.steps[0]); S.pidx=0;
   S.phase="prep"; S.prepMs=S.prepSecs*1000; S.remMs=S.phases[0].sec*1000;
   S.endAt=Date.now()+S.prepMs;
   renderSession();
@@ -1296,16 +1282,71 @@ function totTr(){ return (S.tr||0)+(S.trAuto||0); }
 function rateRound(ok){
   const ph=curPhase(); if(ph.mode!=="sing") return;
   const sung=(ph.note||48)+totTr();
+  const t=S.steps[S.idx].t;
   if(ok){
+    S.rateOkN=(S.rateOkN||0)+1;
     if(S.sessTop==null||sung>S.sessTop) S.sessTop=sung;
-    const t=S.steps[S.idx].t;
     if(S.tops[t]==null||sung>S.tops[t]){ S.tops[t]=sung; saveTops(); }
   } else {
+    S.rateKoN=(S.rateKoN||0)+1;
+    S.koEx=S.koEx||{}; S.koEx[t]=(S.koEx[t]||0)+1;
     S.trAuto-=2; // le prochain round pré-généré (+1) sonnera 1 demi-ton PLUS BAS
   }
   nextPhase(false);
 }
 async function saveTops(){ await Store.setJSON(K_TOPS,S.tops); }
+/* ===== EXPORT / IMPORT — sauvegarde et analyse hebdomadaire ===== */
+function exportPayload(){
+  return JSON.stringify({
+    app:"VOIX", v:1, exportedAt:new Date().toISOString(),
+    profile:{level:S.level, cycle:S.cycle, week:S.week, day:S.day, goal:S.goal},
+    tops:S.tops, logs:S.logs,
+  });
+}
+async function copyExport(btn){
+  const txt=exportPayload();
+  let ok=false;
+  try{ await navigator.clipboard.writeText(txt); ok=true; }
+  catch(e){
+    try{ const ta=document.createElement("textarea"); ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.focus(); ta.select(); ok=document.execCommand("copy"); ta.remove(); }catch(e2){}
+  }
+  if(btn){ const old=btn.textContent; btn.textContent=ok?"✓ Copié — colle-le à Claude":"⚠️ Copie impossible"; setTimeout(()=>{ btn.textContent=old; },2500); }
+}
+function fileExport(){
+  const blob=new Blob([exportPayload()],{type:"application/json"});
+  const name="voix-export-"+todayKey()+".json";
+  try{
+    const f=new File([blob],name,{type:"application/json"});
+    if(navigator.canShare && navigator.canShare({files:[f]})){ navigator.share({files:[f],title:"Export VOIX"}); return; }
+  }catch(e){}
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+function importFilePick(ev){
+  const file=ev.target.files && ev.target.files[0]; ev.target.value=""; if(!file) return;
+  const r=new FileReader();
+  r.onload=async()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(d.app!=="VOIX" || !Array.isArray(d.logs)) throw new Error("format");
+      if(!confirm("Importer cet export ("+d.logs.length+" séances, du "+(d.exportedAt||"?").slice(0,10)+") ?\nTes données actuelles seront REMPLACÉES.")) return;
+      S.logs=d.logs.slice(0,400).filter(l=>l&&l.date);
+      S.tops=(d.tops&&typeof d.tops==="object"&&!Array.isArray(d.tops))?d.tops:{};
+      const p=d.profile||{};
+      if(p.level==="adv"||p.level==="std") S.level=p.level;
+      if(Number.isInteger(p.cycle)&&p.cycle>=1&&p.cycle<=9) S.cycle=p.cycle;
+      if(Number.isInteger(p.week)&&p.week>=1&&p.week<=16) S.week=p.week;
+      if(Number.isInteger(p.day)&&p.day>=1&&p.day<=7) S.day=p.day;
+      if(p.goal>=10&&p.goal<=120) S.goal=p.goal;
+      await Store.setJSON(K_LOGS,S.logs); await saveTops(); await savePrefs();
+      alert("✓ Import réussi : "+S.logs.length+" séances restaurées.");
+      renderProgress();
+    }catch(e){ alert("Fichier invalide — assure-toi d'importer un export VOIX (.json)."); }
+  };
+  r.readAsText(file);
+}
 /* Chrono VFE : tap départ / tap stop — mesure la tenue maximale */
 const CH={on:false,t0:0};
 function chronoToggle(){
@@ -1443,12 +1484,13 @@ function renderEnd(){
   const nc=app.querySelector("#nextCycle");
   if(nc) nc.onclick=()=>{ S.cycle=Math.min(9,S.cycle+1); S.week=1; S.day=1; savePrefs(); renderHome(); };
   const nd=app.querySelector("#nextDay");
-  if(nd) nd.onclick=async()=>{ await doSave(); if(S.day<7) S.day++; else { S.day=1; S.week=Math.min(16,S.week+1); } savePrefs(); renderHome(); };
+  if(nd) nd.onclick=async()=>{ nd.disabled=true; await doSave(); if(S.day<7) S.day++; else { S.day=1; S.week=Math.min(16,S.week+1); } savePrefs(); renderHome(); };
   async function doSave(){
     const prevBest=S.logs.reduce((m,l)=>Math.max(m,l.sssss||0),0);
     S.logs.unshift({ date:todayKey(), ts:Date.now(),
       mode:S.mode, week:S.mode==="week"?S.week:null, day:S.mode==="week"?S.day:null,
-      sssss:S.form.sssss, sens:S.form.sens, note:(S.form.note||"").trim(), top:S.sessTop??null, vfeBest:(S.vfeHolds.length?Math.max(...S.vfeHolds):null) });
+      sssss:S.form.sssss, sens:S.form.sens, note:(S.form.note||"").trim(), top:S.sessTop??null, vfeBest:(S.vfeHolds.length?Math.max(...S.vfeHolds):null),
+      rateOk:S.rateOkN||0, rateKo:S.rateKoN||0, koEx:(S.koEx&&Object.keys(S.koEx).length?S.koEx:null) });
     if(S.logs.length>400) S.logs.length=400;
     const v=S.form.sssss;
     const record = prevBest>0 && v>prevBest;
@@ -1456,7 +1498,7 @@ function renderEnd(){
     S._celebrate = (record||goalHit) ? {record, goal:goalHit, value:v} : null;
     await Store.setJSON(K_LOGS,S.logs);
   }
-  app.querySelector("#save").onclick=async()=>{ await doSave(); renderProgress(); };
+  app.querySelector("#save").onclick=async(e)=>{ e.target.disabled=true; await doSave(); renderProgress(); };
   app.querySelector("#skip").onclick=()=>renderHome();
 }
 
@@ -1575,6 +1617,17 @@ function renderProgress(){
       ${total?`<ul class="hist">${hist}</ul>`:`<div class="empty">Aucune séance enregistrée pour l’instant.<br>Termine une séance et note ton « sssss ».</div>`}
     </div>
 
+    <div class="card">
+      <h3 style="font-size:.82rem;color:var(--muted);font-weight:600;margin:0 0 6px">Données — sauvegarde &amp; analyse</h3>
+      <div class="data-row">
+        <button class="data-btn" id="expCopy">📋 Copier pour Claude</button>
+        <button class="data-btn" id="expFile">📤 Fichier</button>
+        <button class="data-btn" id="impBtn">📥 Importer</button>
+      </div>
+      <input type="file" id="impFile" accept=".json,application/json" style="display:none">
+      <div class="data-hint">Chaque semaine : « Copier », puis colle l’export à Claude — il analyse tes ✓/✗, sommets, souffle, et ajuste ton parcours. Le fichier sert de sauvegarde (change de téléphone sans rien perdre).</div>
+    </div>
+
     <div class="spacer"></div>
     <button class="cta" id="home">Retour à l’accueil</button>
   `;
@@ -1582,6 +1635,10 @@ function renderProgress(){
   app.querySelector("#home").onclick=()=>renderHome();
   app.querySelector("#goalDown").onclick=()=>{ S.goal=Math.max(10,S.goal-1); savePrefs(); renderProgress(); };
   app.querySelector("#goalUp").onclick=()=>{ S.goal=Math.min(120,S.goal+1); savePrefs(); renderProgress(); };
+  app.querySelector("#expCopy").onclick=(e)=>copyExport(e.target);
+  app.querySelector("#expFile").onclick=fileExport;
+  app.querySelector("#impBtn").onclick=()=>app.querySelector("#impFile").click();
+  app.querySelector("#impFile").onchange=importFilePick;
   if(cele){ celebrateBurst(); celebrateSound(); }
 }
 
@@ -1609,36 +1666,6 @@ function refreshToolsTriggers(){
 }
 
 /* ---- panneau ---- */
-function boostBlockHTML(){ return `
-  <div class="tool" id="toolBoost">
-    <div class="tool-head">
-      <div class="tool-name"><span class="em">📢</span> Volume général</div>
-      <button class="rbtn" id="boostTest" style="width:auto;height:38px;padding:0 14px;font-size:.85rem" aria-label="Jouer une note test">Tester</button>
-    </div>
-    <div class="tool-body">
-      <div class="row-ctrl">
-        <button class="rbtn" id="boostDown" aria-label="Moins fort">–</button>
-        <div class="rval"><span id="boostVal">×1,0</span><small>amplifie piano, bourdon, sirènes et bips · limiteur anti-saturation intégré</small></div>
-        <button class="rbtn" id="boostUp" aria-label="Plus fort">+</button>
-      </div>
-      <div class="vol-row">
-        <span class="vol-ic">🔉</span>
-        <input type="range" id="boostRange" min="10" max="30" value="${Math.round((S.boost||1)*10)}" aria-label="Amplification générale">
-        <span class="vol-ic">📢</span>
-      </div>
-    </div>
-  </div>`; }
-function wireBoost(){
-  const p=document.getElementById("toolsPanel"); if(!p) return;
-  const range=p.querySelector("#boostRange"), val=p.querySelector("#boostVal");
-  const show=v=>{ if(val) val.textContent="×"+v.toFixed(1).replace(".",","); if(range) range.value=Math.round(v*10); };
-  show(S.boost||1);
-  const apply=v=>show(setBoost(v));
-  if(range) range.oninput=()=>apply(range.value/10);
-  p.querySelector("#boostDown").onclick=()=>apply((S.boost||1)-0.1);
-  p.querySelector("#boostUp").onclick=()=>apply((S.boost||1)+0.1);
-  p.querySelector("#boostTest").onclick=()=>{ const c=audio(); if(!c) return; pianoNote(A3, c.currentTime+.05, 1.1); };
-}
 function ensureTools(){
   if(T.built) return;
   const back=document.createElement("div"); back.className="tools-backdrop"; back.id="toolsBack";
@@ -1647,14 +1674,12 @@ function ensureTools(){
     <div class="tools-head"><h2>Outils</h2><button class="tools-x" id="toolsClose" aria-label="Fermer">✕</button></div>
     ${droneBlockHTML()}
     ${metroBlockHTML()}
-    ${boostBlockHTML()}
   `;
   document.body.appendChild(back); document.body.appendChild(panel);
   back.onclick=closeTools;
   panel.querySelector("#toolsClose").onclick=closeTools;
   wireDrone();
   wireMetro();
-  wireBoost();
   T.built=true;
 }
 function openTools(){
@@ -1714,7 +1739,7 @@ function toggleDrone(){
 function droneStart(){
   const c=audio(); if(!c) return;
   const f=droneFreq();
-  T.drone.gain=c.createGain(); T.drone.gain.gain.value=0; T.drone.gain.connect(master());
+  T.drone.gain=c.createGain(); T.drone.gain.gain.value=0; T.drone.gain.connect(c.destination);
   T.drone.osc=c.createOscillator(); T.drone.osc.type="triangle"; T.drone.osc.frequency.value=f;
   T.drone.osc2=c.createOscillator(); T.drone.osc2.type="sine"; T.drone.osc2.frequency.value=f; T.drone.osc2.detune.value=-3;
   const g2=c.createGain(); g2.gain.value=.55;
@@ -1802,7 +1827,7 @@ function clickAt(t, accent){
   const c=audio(); if(!c) return;
   const o=c.createOscillator(), g=c.createGain();
   o.type="square"; o.frequency.value=accent?1700:1150;
-  o.connect(g); g.connect(master());
+  o.connect(g); g.connect(c.destination);
   g.gain.setValueAtTime(0,t);
   g.gain.linearRampToValueAtTime(accent?.26:.16,t+.004);
   g.gain.exponentialRampToValueAtTime(.0001,t+.05);
@@ -1861,11 +1886,15 @@ function patDur(patName, tempo){
   const pat=PATTERNS[patName]||[0]; const beat=60/(tempo||90);
   return pat.length*beat + .3;
 }
+// Plafonds de sécurité (ténor) : aucun round généré ne dépasse ces sommets,
+// quels que soient niveau, cycle et boost — le ✓/✗ règle le reste.
+const TOPCAP_MEL=74, TOPCAP_SUS=69; // Ré5 en mouvement · La4 tenu
 function crMel(patName, root, rounds, opt={}){
   const tempo=opt.tempo||90, art=opt.art||"legato", d=patDur(patName,tempo);
+  const maxPat=Math.max(...(PATTERNS[patName]||[0]));
   const sl=opt.singLabel||"Reproduis exactement le modèle", ll=opt.listenLabel||"Modèle au piano — écoute", ph=[];
   for(let i=0;i<rounds;i++){
-    const r=root+i;
+    const r=Math.min(root+i, TOPCAP_MEL-maxPat);
     ph.push({mode:"listen", sec:Math.max(4,Math.ceil(d+1.2)), play:{pat:patName,root:r,tempo,art}, note:r, label:ll});
     ph.push({mode:"sing",   sec:Math.ceil(d+1.5),             play:{pat:patName,root:r,tempo,art}, note:r, ref:true, label:sl});
   }
@@ -1874,7 +1903,7 @@ function crMel(patName, root, rounds, opt={}){
 function crSus(root, rounds, opt={}){
   const hold=opt.holdSec||8, sl=opt.singLabel||"Tiens le son, stable et soutenu", ll=opt.listenLabel||"Cible — écoute", ph=[];
   for(let i=0;i<rounds;i++){
-    const r=root+i;
+    const r=Math.min(root+i, TOPCAP_SUS);
     ph.push({mode:"listen", sec:3,    play:{note:r,art:"sustain"}, note:r, label:ll});
     ph.push({mode:"sing",   sec:hold, play:{note:r,art:"sustain"}, note:r, ref:true, sustain:true, label:sl});
   }
@@ -1889,7 +1918,7 @@ const SPEC={
   "Justesse — intervalles":{f:"mel",pat:"arpUpDown",root:53,rounds:7,tempo:108,singLabel:"Arpège d'octave — tierce et quinte justes, octave ouverte"},
   "Résonance — ng → a":{f:"sus",root:55,rounds:6,holdSec:7,listenLabel:"La cible",singLabel:"« ng »→« a » : garde le squillo (≈3 kHz) en ouvrant la voyelle"},
   "Résonance — nay nay nay":{f:"mel",pat:"arpUp",root:55,rounds:6,tempo:116,singLabel:"« nay » twang assumé — brillance qui projette sur tout l'arpège"},
-  "Passaggio — goug / mum":{f:"mel",pat:"arp9",root:53,rounds:7,tempo:100,singLabel:"« goug » jusqu'à la 10e — passaggio connecté, voile fermé, sans bascule"},
+  "Passaggio — goug / mum":{f:"mel",pat:"arp9",root:51,rounds:6,tempo:100,singLabel:"« goug » jusqu'à la 10e — passaggio connecté, voile fermé, sans bascule"},
   "Agilité — gammes rapides":{f:"mel",pat:"scale9",root:52,rounds:6,tempo:152,singLabel:"Run de neuvième — léger, articulé, larynx stable, à tempo"},
   "Agilité — staccato":{f:"mel",pat:"arp9",root:52,rounds:6,tempo:138,art:"staccato",singLabel:"Staccato sur la 10e — appui constant, attaques perlées"},
   "Nuances — messa di voce":{f:"sus",root:55,rounds:5,holdSec:16,singLabel:"Messa di voce : pp→ff→pp, hauteur et timbre immobiles"},
@@ -2016,7 +2045,7 @@ function exDurMs(step){ return buildPhases(step).reduce((a,p)=>a+p.sec*1000,0); 
 let modelNodes=[], modelPlayTO=null;
 function pianoNote(freq,t,len){
   const c=audio(); if(!c||S.muted) return;
-  const g=c.createGain(); g.connect(master());
+  const g=c.createGain(); g.connect(c.destination);
   const oscs=[[1,.5,"triangle"],[2,.16,"sine"],[3,.07,"sine"]].map(([mu,a,tp])=>{
     const o=c.createOscillator(); o.type=tp; o.frequency.value=freq*mu;
     const og=c.createGain(); og.gain.value=a; o.connect(og); og.connect(g);
@@ -2043,7 +2072,7 @@ function playNoteRef(midi){ audio(); stopModel(); pianoNote(midiToFreq(midi), au
 let holdNodes=null;
 function startHold(midi, durSec){
   stopHold(); const c=audio(); if(!c||S.muted) return;
-  const g=c.createGain(); g.gain.value=0; g.connect(master());
+  const g=c.createGain(); g.gain.value=0; g.connect(c.destination);
   const o=c.createOscillator(); o.type="triangle"; o.frequency.value=midiToFreq(midi);
   const o2=c.createOscillator(); o2.type="sine"; o2.frequency.value=midiToFreq(midi); o2.detune.value=-3;
   const g2=c.createGain(); g2.gain.value=.5; o.connect(g); o2.connect(g2); g2.connect(g);
@@ -2065,7 +2094,7 @@ let sirenNodes=null;
 function startSiren(loM, hiM, durSec, dir){
   stopSiren(); const c=audio(); if(!c||S.muted) return;
   const lo=midiToFreq(loM), hi=midiToFreq(Math.max(loM+2,hiM));
-  const g=c.createGain(); g.gain.value=0; g.connect(master());
+  const g=c.createGain(); g.gain.value=0; g.connect(c.destination);
   const o=c.createOscillator(); o.type="triangle"; o.connect(g);
   const og=c.createGain(); og.gain.value=.5; const o2=c.createOscillator(); o2.type="sine"; o2.connect(og); og.connect(g);
   const t0=c.currentTime+.05, end=t0+durSec, V=.17;
@@ -2426,7 +2455,7 @@ function celebrateSound(){
 /* =========================================================
    PERSISTANCE position + prefs
    ========================================================= */
-async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,boost:S.boost,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal,level:S.level,cycle:S.cycle}); }
+async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal,level:S.level,cycle:S.cycle}); }
 
 /* =========================================================
    BOOT
@@ -2435,7 +2464,6 @@ async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,boost:S.b
   const prefs=await Store.getJSON(K_PREFS,{});
   if(prefs && typeof prefs==="object"){
     if(typeof prefs.muted==="boolean") S.muted=prefs.muted;
-    if(typeof prefs.boost==="number"&&prefs.boost>=1&&prefs.boost<=3){ S.boost=Math.round(prefs.boost*10)/10; if(MASTER) MASTER.gain.value=S.boost; }
     if(prefs.week>=1&&prefs.week<=16) S.week=prefs.week;
     if(prefs.day>=1&&prefs.day<=7) S.day=prefs.day;
     if([3,5,8].includes(prefs.prepSecs)) S.prepSecs=prefs.prepSecs;
