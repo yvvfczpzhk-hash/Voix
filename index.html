@@ -348,6 +348,9 @@
     background:var(--surface-2);color:var(--ink);font-weight:700;font-size:.8rem;transition:transform .08s}
   .data-btn:active{transform:scale(.96)}
   .data-hint{margin-top:10px;font-size:.75rem;color:var(--muted-2);line-height:1.5}
+  .rate-hint{margin:8px auto 0;max-width:340px;text-align:center;font-size:.72rem;color:var(--muted-2);line-height:1.45}
+  .ss-chrono{width:100%;margin-top:10px;padding:11px;border-radius:12px;border:1.5px dashed var(--border);background:transparent;color:var(--muted);font-weight:700;font-size:.8rem;font-family:var(--mono)}
+  .ss-chrono.run{border-style:solid;border-color:var(--accent);color:var(--accent)}
 
   /* « Comment faire ? » */
   .how-btn{display:block;margin:10px auto 0;padding:7px 15px;border-radius:999px;background:var(--surface);
@@ -1118,6 +1121,7 @@ function renderSession(){
       <button class="rate-btn ok" id="rateOk">✓ Propre</button>
       <button class="rate-btn ko" id="rateKo">✗ Forcé</button>
     </div>
+    <div class="rate-hint" id="rateHint" style="display:none">Sois un juge intraitable : ✗ n’est pas un échec, c’est l’info qui règle ta difficulté. Timbre égal, zéro poussée = ✓.</div>
     <div class="rec-row" id="recRow" style="display:none">
       <button class="rec-btn" id="recBtn">⏺ M’enregistrer</button>
       <button class="rec-btn play" id="recPlay" style="display:none">▶ Moi</button>
@@ -1255,7 +1259,9 @@ function paintControls(){
 }
 function paintRate(){
   const rr=document.getElementById("rateRow");
-  if(rr) rr.style.display = (S.phase==="run" && curPhase().mode==="sing") ? "flex" : "none";
+  const showRate=(S.phase==="run" && curPhase().mode==="sing");
+  if(rr) rr.style.display = showRate ? "flex" : "none";
+  const rh=document.getElementById("rateHint"); if(rh) rh.style.display = showRate ? "block" : "none";
   const er=document.getElementById("exRecord");
   if(er){
     const top=S.tops[S.steps[S.idx].t];
@@ -1456,6 +1462,7 @@ function renderEnd(){
           <div><span class="num-val" id="ssVal">${S.form.sssss}</span> <span class="num-unit">s</span></div>
           <button class="stepper" id="plus">+</button>
         </div>
+        <button class="ss-chrono" id="ssChrono">⏱ Mesurer maintenant — inspire, tape, « sssss », re-tape</button>
       </div>
       <div class="field">
         <label>Sensation du jour</label>
@@ -1476,6 +1483,16 @@ function renderEnd(){
   `;
   app.querySelector("#minus").onclick=()=>{ S.form.sssss=Math.max(0,S.form.sssss-1); document.getElementById("ssVal").textContent=S.form.sssss; };
   app.querySelector("#plus").onclick=()=>{ S.form.sssss=Math.min(120,S.form.sssss+1); document.getElementById("ssVal").textContent=S.form.sssss; };
+  const sc=app.querySelector("#ssChrono"); let scT0=0, scTick=null;
+  if(sc) sc.onclick=()=>{
+    if(!scT0){ scT0=performance.now(); sc.classList.add("run");
+      scTick=setInterval(()=>{ sc.textContent="⏹ "+((performance.now()-scT0)/1000).toFixed(1)+" s — re-tape à bout de souffle"; },100);
+    } else {
+      clearInterval(scTick); const d=Math.round((performance.now()-scT0)/1000); scT0=0; sc.classList.remove("run");
+      if(d>=3&&d<=120){ S.form.sssss=d; document.getElementById("ssVal").textContent=d; sc.textContent="✓ "+d+" s enregistré — remesure si tu veux"; }
+      else sc.textContent="⏱ Mesurer maintenant — inspire, tape, « sssss », re-tape";
+    }
+  };
   app.querySelectorAll(".star").forEach(b=>b.onclick=()=>{
     S.form.sens=+b.dataset.n;
     app.querySelectorAll(".star").forEach(s=>s.classList.toggle("on",+s.dataset.n<=S.form.sens));
