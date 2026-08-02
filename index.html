@@ -1506,7 +1506,7 @@ function renderEnd(){
     const prevBest=S.logs.reduce((m,l)=>Math.max(m,l.sssss||0),0);
     S.logs.unshift({ date:todayKey(), ts:Date.now(),
       mode:S.mode, week:S.mode==="week"?S.week:null, day:S.mode==="week"?S.day:null,
-      sssss:S.form.sssss, sens:S.form.sens, note:(S.form.note||"").trim(), top:S.sessTop??null, vfeBest:(S.vfeHolds.length?Math.max(...S.vfeHolds):null),
+      sssss:S.form.sssss, sens:S.form.sens, note:(S.form.note||"").trim(), top:S.sessTop??null, vfeBest:(S.vfeHolds.length?Math.max(...S.vfeHolds):null), vfeAvg:(S.vfeHolds.length?Math.round(10*S.vfeHolds.reduce((a,b)=>a+b,0)/S.vfeHolds.length)/10:null),
       rateOk:S.rateOkN||0, rateKo:S.rateKoN||0, koEx:(S.koEx&&Object.keys(S.koEx).length?S.koEx:null) });
     if(S.logs.length>400) S.logs.length=400;
     const v=S.form.sssss;
