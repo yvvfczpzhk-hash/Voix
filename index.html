@@ -1011,7 +1011,9 @@ function enterPhase(j){
   phaseCue(ph.mode);
   if(ph.mode==="listen"){ playPhaseModel(ph.play); }
   else if(ph.mode==="sing"){
+    const isEar=S.steps[S.idx].t.startsWith("Oreille");
     if(ph.sustain){ startHold((ph.note||48)+totTr(), ph.sec); }
+    else if(S.duo && ph.play && !isEar){ setTimeout(()=>{ if(S.running&&S.phase==="run"&&S.pidx===j) playPhaseModel(ph.play); }, 150); }
     else if(ph.ref){ setTimeout(()=>{ if(S.running&&S.phase==="run"&&S.pidx===j) playNoteRef((ph.note||48)+totTr()); }, 150); }
   }
   else if(ph.mode==="siren"){ const gd=ph.guide||[45,57]; startSiren(gd[0]+totTr(), gd[1]+totTr(), ph.sec, ph.dir); }
@@ -1116,6 +1118,7 @@ function renderSession(){
         <button class="rbtn sm" id="phaseUp" aria-label="Plus aiguë">+</button>
       </div>
       <button class="pill drone-pill" id="phaseDrone">🎵 Bourdon</button>
+      <button class="pill drone-pill" id="phaseDuo">🎹 Duo</button>
     </div>
     <div class="rate-row" id="rateRow" style="display:none">
       <button class="rate-btn ok" id="rateOk">✓ Propre</button>
@@ -1162,6 +1165,7 @@ function renderSession(){
   app.querySelector("#phaseDown").onclick=()=>shiftPhase(-1);
   app.querySelector("#phaseUp").onclick=()=>shiftPhase(1);
   app.querySelector("#phaseDrone").onclick=toggleExerciseDrone;
+  app.querySelector("#phaseDuo").onclick=()=>{ S.duo=!S.duo; savePrefs(); paintControls(); };
   app.querySelector("#rateOk").onclick=()=>rateRound(true);
   app.querySelector("#rateKo").onclick=()=>rateRound(false);
   app.querySelector("#chronoBtn").onclick=chronoToggle;
@@ -1255,6 +1259,7 @@ function paintControls(){
   if(!hasModel) return;
   const rootEl=document.getElementById("phaseRoot"); if(rootEl) rootEl.textContent=midiName(phaseRootMidi());
   const db=document.getElementById("phaseDrone"); if(db) db.classList.toggle("on",T.drone.on);
+  const du=document.getElementById("phaseDuo"); if(du){ du.classList.toggle("on",!!S.duo); du.style.display = S.steps[S.idx].t.startsWith("Oreille") ? "none" : "inline-flex"; }
   const rp=document.getElementById("phaseReplay"); if(rp) rp.firstChild&&(rp.textContent = ph.mode==="siren" ? "▶ Relancer" : "▶ Rejouer");
 }
 function paintRate(){
@@ -1935,7 +1940,14 @@ const SPEC={
   "Justesse — intervalles":{f:"mel",pat:"arpUpDown",root:53,rounds:7,tempo:108,singLabel:"Arpège d'octave — tierce et quinte justes, octave ouverte"},
   "Résonance — ng → a":{f:"sus",root:55,rounds:6,holdSec:7,listenLabel:"La cible",singLabel:"« ng »→« a » : garde le squillo (≈3 kHz) en ouvrant la voyelle"},
   "Résonance — nay nay nay":{f:"mel",pat:"arpUp",root:55,rounds:6,tempo:116,singLabel:"« nay » twang assumé — brillance qui projette sur tout l'arpège"},
-  "Passaggio — goug / mum":{f:"mel",pat:"arp9",root:51,rounds:6,tempo:100,singLabel:"« goug » jusqu'à la 10e — passaggio connecté, voile fermé, sans bascule"},
+  "Passaggio — goug / mum":{f:"fn",make:()=>{
+    const n=6+lvRounds(), r0=adaptRoot("Passaggio — goug / mum", 51+lvRoot(), n);
+    return [
+      {mode:"do",sec:20,label:"Forme le son : PARLE « goug-goug-goug » sur une note grave, un peu bâillant — G doux, OU fermé, volume de conversation fatiguée"},
+      {mode:"siren",dir:"up",guide:[48,58],sec:15,label:"Glisse un « goug » doux du grave au médium avec la sirène — le G connecte, le OU allège"},
+      ...crMel("arp9", r0, n, {tempo:Math.round(100*lvTempo()), singLabel:"« goug » presque parlé, tout doux — le OU reste FERMÉ jusqu'en haut (petit et connecté = parfait)"}),
+    ];
+  }},
   "Agilité — gammes rapides":{f:"mel",pat:"scale9",root:52,rounds:6,tempo:152,singLabel:"Run de neuvième — léger, articulé, larynx stable, à tempo"},
   "Agilité — staccato":{f:"mel",pat:"arp9",root:52,rounds:6,tempo:138,art:"staccato",singLabel:"Staccato sur la 10e — appui constant, attaques perlées"},
   "Nuances — messa di voce":{f:"sus",root:55,rounds:5,holdSec:16,singLabel:"Messa di voce : pp→ff→pp, hauteur et timbre immobiles"},
@@ -2372,9 +2384,11 @@ const HOW={
     "Cherche la brillance qui « coupe » (le ring) — c’est ce qui fait porter la voix sans forcer. Le modèle te donne la hauteur.",
   ],
   "Passaggio — goug / mum":[
-    "Le passaggio est la zone où la voix « craque ». La consonne fermée de « goug » (ou « mum ») garde les cordes connectées quand tu montes.",
-    "Sur l’arpège do-mi-sol-do-sol-mi-do. Si ça craque, fais-le d’abord en lip trill, puis sur la voyelle.",
-    "Monte progressivement dans ta zone de passage, sans forcer le volume — le but est de passer en douceur, pas fort.",
+    "Le « goug » est un exercice de GESTE, pas de hauteur : le G (langue au voile) connecte les cordes sans coup de glotte et bloque la fuite d’air ; le OU fermé crée l’espace qui allège dans le passage ; le G final referme pour la note suivante.",
+    "Étape 1 (l’app te la fait faire) : PARLE « goug-goug-goug » grave, un peu bâillant, presque bête — volume d’une conversation fatiguée. Si ça ressemble à du chant, c’est trop. Étape 2 : glisse-le en suivant la sirène.",
+    "Sur l’arpège : pense « parler l’arpège ». La règle d’or en montant — le OU reste OU. S’il s’ouvre en « o » puis « a », tu rebascules en pleine voix poussée et ça craque. Lèvres arrondies jusqu’en haut, quitte à ce que le son devienne minuscule.",
+    "Ton critère ✓ : aucune bascule audible en traversant Mi4-Fa#4, le haut sort FACILE même si tout petit. Petit + connecté = parfait ✓. Gros + ouvert = ✗ (et c’est le OU ou le volume, jamais « toi »).",
+    "Si le goug résiste plusieurs jours : remplace par « mum » (M plus doux, buzz des lèvres) — même mécanique, marche plus basse. Puis reviens au goug.",
   ],
   "Passaggio — sirènes ng":[
     "Sirènes (glissandos continus) sur « ng », lentement, en traversant ta zone de rupture sans t’arrêter ni craquer.",
@@ -2472,7 +2486,7 @@ function celebrateSound(){
 /* =========================================================
    PERSISTANCE position + prefs
    ========================================================= */
-async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal,level:S.level,cycle:S.cycle}); }
+async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal,level:S.level,cycle:S.cycle,duo:!!S.duo}); }
 
 /* =========================================================
    BOOT
@@ -2487,6 +2501,7 @@ async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.we
     if(prefs.level==="adv"||prefs.level==="std") S.level=prefs.level;
     if(prefs.goal>=10&&prefs.goal<=120) S.goal=prefs.goal;
     if(Number.isInteger(prefs.cycle)&&prefs.cycle>=1&&prefs.cycle<=9) S.cycle=prefs.cycle;
+    if(typeof prefs.duo==="boolean") S.duo=prefs.duo;
   }
   S.tops=await Store.getJSON(K_TOPS,{}) || {};
   S.logs=await Store.getJSON(K_LOGS,[]) || [];
