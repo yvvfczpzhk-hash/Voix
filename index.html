@@ -501,6 +501,7 @@ const WEEKS = {
       },
       steps:[
         {t:"Échauffement express", s:240, c:[`Sirènes + ng→a + attaques`,`Six minutes, opérationnel`]},
+        {t:"Voix parlée → chantée", s:120, c:[`Parle une phrase, puis chante-la sur la note`,`Même densité qu'en parlant — mezzo-forte`], tip:`Ta voix parlée est ta référence : elle n'est pas soufflée.`},
         {t:"Oreille — intervalles chantés", s:72, c:[`Deux notes à reproduire`,`L’écart exact`]},
         {t:"Passaggio — sirènes ng", s:120, c:[`Sirène « ng » à travers le break`,`Transition fluide, pression constante`]},
         {t:"Passaggio — goug / mum", s:140, c:[`Arpège jusqu’à la 10e`,`Connecté, voile fermé, sans bascule`]},
@@ -521,7 +522,8 @@ const WEEKS = {
       steps:[
         {t:"Échauffement express", s:240, c:[`Le rituel`,`Complet et fluide`]},
         {t:"Oreille — intervalles chantés", s:72, c:[`Sixtes et octaves surtout`,`Les grands écarts`]},
-        {t:"Mix — quintes descendantes cuperto", s:120, c:[`Descends couvert depuis la quinte`,`La légèreté du haut jusqu’en bas`]},
+        {t:"Voix parlée → chantée", s:120, c:[`Le pont parole → chant`,`Densité de la voix parlée`], tip:`Le socle du mois : ramener le corps du son.`},
+        {t:"Poitrine — descentes parlées", s:120, c:[`5-4-3-2-1 en voix pleine, mezzo-forte`,`Son épais et ancré — pas de légèreté ici`]},
         {t:"Passaggio — goug / mum", s:140, c:[`Le pont monte`,`Un demi-ton de plus cette semaine`]},
         {t:"Registres — sauts d'octave", s:120, c:[`« oui-oui » d’octave`,`Mix léger, jamais poussé`]},
         {t:"Retour au calme", s:60, c:[`Détente complète`,`Le mix se consolide au repos`]},
@@ -540,6 +542,7 @@ const WEEKS = {
       steps:[
         {t:"Échauffement express", s:240, c:[`Complet avant l’aigu`,`Jamais d’aigu à froid`]},
         {t:"Oreille — justesse descendante", s:80, c:[`Descentes précises`,`Par au-dessus`]},
+        {t:"Poitrine — appel bratty", s:120, c:[`« nyaa » insolent, voix pleine`,`Ancre la poitrine AVANT de monter`], tip:`Pas joli = efficace. On adoucira après.`},
         {t:"Étendue — arpège long", s:130, c:[`Octave + quinte`,`Allège en montant`]},
         {t:"Aigu — descente depuis le haut", s:130, c:[`Attaque la note haute, légère`,`Puis descends — la détente s’installe`]},
         {t:"Modification de voyelle", s:100, c:[`L’outil de l’aigu`,`La gorge se désamorce`]},
@@ -560,6 +563,7 @@ const WEEKS = {
         {t:"SOVT — paille & lip trills", s:300, c:[`Récupération active`,`Douceur totale`]},
         {t:"VFE 2 — Glissé grave → aigu", s:45, c:[`« knoll » sans trou`,`L’étirement`]},
         {t:"VFE 3 — Glissé aigu → grave", s:45, c:[`Sans décrocher`,`La contraction`]},
+        {t:"Ancrage — onset ferme", s:130, c:[`Fry → « uh-oh » → notes attaquées net`,`La fermeture, sans forcer`], tip:`À refaire les jours où la voix est soufflée.`},
         {t:"Oreille — intervalles chantés", s:72, c:[`Consolidation`,`Réflexes`]},
         {t:"Passaggio — goug / mum", s:140, c:[`Plus bas, parfait`,`Le pont est acquis`]},
         {t:"Retour au calme", s:60, c:[`Fin de mois`,`Détente`]},
@@ -579,6 +583,7 @@ const WEEKS = {
       steps:[
         {t:"Échauffement express", s:240, c:[`Le rituel`,`Complet`]},
         {t:"Oreille — intonation battements", s:90, c:[`Bourdon + intervalle à caler`,`La fusion parfaite`]},
+        {t:"Poitrine — descentes parlées", s:110, c:[`Entretien de l'ancrage`,`Voix pleine, mezzo-forte`]},
         {t:"Voyelles — égalisation", s:130, c:[`i-é-a-o-ou sur la note`,`Même placement, même volume`]},
         {t:"Justesse — note tenue (drone)", s:100, c:[`Stabilité renforcée`,`Le vibrato s’égalise`]},
         {t:"Legato — ligne", s:120, c:[`Gamme lente sur « ou »`,`Comme un archet`]},
@@ -598,6 +603,7 @@ const WEEKS = {
       steps:[
         {t:"Échauffement express", s:240, c:[`Prêt en six minutes`,`L’ordre compte`]},
         {t:"Legato — portamento contrôlé", s:90, c:[`Glissés lents et réguliers`,`Le trajet est le but`]},
+        {t:"Mix — quintes descendantes cuperto", s:120, c:[`Descends couvert depuis la quinte`,`La légèreté du haut jusqu’en bas`], tip:`Maintenant que la poitrine est ancrée, on affine le mix.`},
         {t:"Legato — ligne", s:120, c:[`Le son ne s’interrompt jamais`,`Volume égal`]},
         {t:"Vibrato — libération", s:130, c:[`Droit puis lâcher`,`5-6 ondulations/s, naturelles`]},
         {t:"Oreille — majeur / mineur", s:80, c:[`La couleur de la tierce`,`Reproduis-la exactement`]},
@@ -1896,6 +1902,7 @@ const PATTERNS={
   descTop:[12,11,9,7,5,4,2,0],            // descente depuis la note haute
   osc:[0,2,0,2,0,2,0],                    // oscillation rapide (pré-trille)
   cuperto:[7,5,4,2,0],                    // quintes descendantes couvertes
+  arp5:[0,4,7,4,0],                       // appel de quinte (ancrage poitrine)
   callUp:[0,7,7,7,0],                     // appel projeté sur la quinte
 };
 // ---- SYSTÈME DE PHASES : appel-réponse (écoute → à toi) + sous-étapes + sirènes guidées ----
@@ -1989,6 +1996,24 @@ const SPEC={
     {mode:"do",sec:45,chrono:true,note:n,label:"« ol » tenu au MAXIMUM — chronomètre, puis note suivante"},
   ])},
   "Réveil — sirènes":{f:"seq",phases:[{mode:"siren",guide:[43,62],sec:90,label:"Paille ou lip trills — suis la sirène, réveille toute l’étendue sans forcer"}]},
+  /* — ANCRAGE POITRINE : ramener le corps du son (muscle TA) — */
+  "Voix parlée → chantée":{f:"fn",make:()=>[
+    {mode:"do",sec:20,label:"PARLE d'abord : dis une phrase à voix haute, normalement. Écoute-la — elle est timbrée, dense, pas soufflée. C'est CE son qu'on transporte dans le chant."},
+    ...crSus(46, 5+lvRounds(), {holdSec:9, listenLabel:"La note — dans ton registre de PAROLE",
+      singLabel:"Dis ta phrase SUR la note (parlé-chanté), puis tiens la dernière syllabe — même timbre qu'en parlant, mezzo-forte. Surtout pas doux."}),
+  ]},
+  "Poitrine — descentes parlées":{f:"mel",pat:"cuperto",root:50,rounds:6,tempo:84,
+    listenLabel:"Le modèle — 5-4-3-2-1",
+    singLabel:"Voix PLEINE et parlée, mezzo-forte — son épais et ancré, comme si tu appelais quelqu'un dans la rue. Ici on ne cherche PAS la légèreté."},
+  "Poitrine — appel bratty":{f:"mel",pat:"arp5",root:50,rounds:6,tempo:92,
+    listenLabel:"Le modèle — l'appel",
+    singLabel:"« nyaa » volontairement bratty, un peu insolent/canard, voix pleine — c'est ce son « pas joli » qui rebranche la poitrine. Fort, mais gorge libre."},
+  "Ancrage — onset ferme":{f:"fn",make:()=>[
+    {mode:"do",sec:24,label:"Vocal fry : le grésillement grave RELÂCHÉ, 3 × 8 s — presque zéro air, juste les cordes qui claquent doucement. C'est la fermeture pure."},
+    {mode:"do",sec:20,label:"« uh-oh ! » ×10, comme une petite surprise — sens le départ net et instantané : ça, c'est un onset fermé"},
+    ...crSus(48, 4+lvRounds(), {holdSec:6, listenLabel:"La note",
+      singLabel:"Démarre en fry puis « allume » la note : timbrée dès la 1re milliseconde, zéro souffle devant le son"}),
+  ]},
   /* — Migrés depuis les steps (réutilisables) — */
   "Souffle & appui":{f:"seq",phases:[
     {mode:"do",sec:40,label:"Appoggio : 4 respirations basses costo-diaphragmatiques — épaules immobiles, soutien bas"},
@@ -2189,6 +2214,32 @@ function markPlaying(dur){
    « COMMENT FAIRE ? » — explications détaillées par étape
    ========================================================= */
 const HOW={
+  "Voix parlée → chantée":[
+    "L'exercice le plus important si ta voix chantée est plus soufflée/légère que ta voix parlée. Ta voix qui parle est la PREUVE que ton muscle de poitrine fonctionne parfaitement — le problème n'est donc pas musculaire, c'est un mode que tu quittes dès que tu « passes en mode chant ».",
+    "Étape 1 : parle une phrase normalement, à voix haute. Mémorise la sensation : dense, timbrée, appuyée sur rien de spécial.",
+    "Étape 2 : dis la MÊME phrase sur la note donnée (parlé-chanté, très proche du théâtre), puis tiens la dernière syllabe. Le but : que rien ne change entre parler et chanter — même densité, même volume de conversation animée.",
+    "Le piège à éviter : dès que la note arrive, adoucir et « faire joli ». Non : reste vulgaire, parlé, mezzo-forte. La beauté viendra plus tard, quand le corps du son sera là.",
+    "Ton critère ✓ : la note tenue sonne comme ta voix qui parle, pas comme une voix de chanteur qui s'écoute. ✗ dès que ça devient aérien ou poli.",
+  ],
+  "Poitrine — descentes parlées":[
+    "Descendre 5-4-3-2-1 en voix pleine : le mouvement descendant est le plus sûr moyen de RAMENER de la poitrine, parce que la voix retrouve naturellement son mécanisme épais en descendant.",
+    "Volume mezzo-forte, pas plus — mais surtout pas moins. La voix soufflée naît presque toujours d'un volume trop bas : sous un certain seuil, les cordes ne s'accolent plus complètement et l'air fuit.",
+    "Image juste : tu appelles quelqu'un de l'autre côté de la rue, sans crier. Le son est dense, direct, un peu « brut ».",
+    "Attention à la nuance : mezzo-forte ne veut pas dire pousser. La gorge reste libre, la mâchoire pend. Si tu serres, c'est trop — mais si c'est aérien, c'est trop peu.",
+  ],
+  "Poitrine — appel bratty":[
+    "Le son « bratty » (insolent, un peu canard, façon enfant qui nargue) combine deux choses : le twang, qui rend le son efficace, et l'engagement du muscle de poitrine. C'est le raccourci le plus rapide vers un son ancré.",
+    "« nyaa nyaa » sur l'arpège 1-3-5-3-1, volontairement pas joli. Ce caractère nasillard-brillant n'est pas le but final : c'est un outil qui rebranche la bonne configuration, qu'on adoucira ensuite.",
+    "Tests de sécurité : ça doit rester facile à répéter 10 fois, sans serrage de gorge ni fatigue. Bratty ≠ crié.",
+    "Une fois le son trouvé : refais l'arpège en enlevant progressivement le côté « canard » mais en GARDANT la densité. C'est ça, une belle voix ancrée.",
+  ],
+  "Ancrage — onset ferme":[
+    "Une voix soufflée, c'est d'abord une fermeture incomplète : les cordes ne s'accolent pas totalement et l'air fuit entre elles. Cet exercice travaille la fermeture directement, sans jamais forcer.",
+    "Phase 1 — le vocal fry (grésillement grave relâché) : c'est de la fermeture pure avec quasi zéro pression d'air. Le muscle travaille, la voix ne fatigue pas. L'exercice le plus efficace du lot.",
+    "Phase 2 — « uh-oh ! » : le petit départ net et instantané. Pas un coup de glotte violent : une décision claire, comme dans la parole surprise.",
+    "Phase 3 — pars du fry puis « allume » la note tenue : le son doit être timbré dès la première milliseconde, sans le petit « h » soufflé devant. Si tu entends une fuite d'air au démarrage : ✗, recommence depuis le fry.",
+    "À faire aussi les jours où ta voix est fatiguée et soufflée : c'est le protocole de récupération de la fermeture.",
+  ],
   "Registres — sauts d'octave":[
     "Le saut d'octave force ton système à changer de configuration (grave→aigu) instantanément — c'est l'exercice roi de la coordination des registres.",
     "Sur « oui-oui » : la note basse ancrée, puis la note haute en mix LÉGER, comme si tu la posais par au-dessus. Même colonne d'air, zéro poussée.",
