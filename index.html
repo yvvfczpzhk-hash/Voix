@@ -16,7 +16,7 @@
     --border:rgba(255,255,255,.10);
     --ink:#F4EEE6;
     --muted:#A99FB4;
-    --muted-2:#7E7488;
+    --muted-2:#8A8094;
     --accent:#D99A5B;            /* overridden per week */
     --accent-ink:#1a1208;
     --track:rgba(255,255,255,.09);
@@ -306,7 +306,7 @@
   .model-play:active{transform:scale(.96)}
   .model-play.playing{filter:brightness(1.15);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent)}
   .model-tr{display:flex;align-items:center;gap:8px}
-  .rbtn.sm{width:38px;height:38px;font-size:1.2rem;border-radius:11px}
+  .rbtn.sm{width:44px;height:44px;font-size:1.2rem;border-radius:11px}
   .model-root{font-family:var(--mono);font-weight:600;min-width:50px;text-align:center;color:var(--ink);font-size:.95rem}
 
   /* PHASES : bannière (écoute / à toi / fais) + instruction + contrôles */
@@ -338,7 +338,7 @@
   .rec-btn.play{border-color:#5fd08a;color:#5fd08a}
   @keyframes recpulse{0%,100%{opacity:1}50%{opacity:.55}}
   .cycle-opts{display:flex;align-items:center;gap:10px}
-  .cycle-opts button{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:1.1rem;font-weight:700}
+  .cycle-opts button{width:44px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:1.1rem;font-weight:700}
   .cyc-n{font-family:var(--mono);font-weight:700;min-width:22px;text-align:center}
   .prep-lbl small{display:block;font-size:.68rem;color:var(--muted-2);font-weight:500}
   .cycle-done{margin:12px auto 4px;text-align:center;font-weight:700}
@@ -387,6 +387,10 @@
   .burst{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
   .burst span{position:absolute;top:42%;animation:burst 1.9s ease-out forwards}
   @keyframes burst{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1}100%{transform:translateY(-230px) scale(1.1);opacity:0}}
+  /* G8 — cibles tactiles ≥ 44 px (mains prises) */
+  .rec-btn,.how-btn,.data-btn,.pill,.chrono-btn,.ss-chrono,.rate-btn{min-height:44px}
+  /* G7 — mouvement réduit respecté */
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -727,17 +731,18 @@ const WEEKS = {
 };
 const REC_DAYS = [3,7];
 // Un seul point d'attention par séance — principe pédagogique clé
+// Focus EXTERNE et distal (Atkins 2013, 2017) : viser un effet loin du corps améliore le timbre
 const FOCUS=[
-  "le souffle porte tout — le son se pose dessus",
-  "zéro tension de mâchoire, elle pend, libre",
-  "la voyelle reste pure du début à la fin de la note",
-  "vise la note par au-dessus, jamais par en dessous",
-  "le volume vient de la résonance, pas de la poussée",
-  "chaque attaque est décidée AVANT d'inspirer",
-  "larynx posé, stable, même en montant",
-  "écoute-toi comme si c'était quelqu'un d'autre",
-  "legato : le son ne s'interrompt jamais entre les notes",
-  "la fin de note est aussi soignée que le début",
+  "envoie chaque son vers le mur d'en face, loin devant toi",
+  "remplis toute la pièce de son, jusque dans les coins",
+  "chante pour quelqu'un assis au dernier rang d'une grande salle",
+  "le son est un fil tendu vers le fond de la pièce — il ne casse jamais",
+  "lance chaque phrase vers une cible précise de la salle",
+  "raconte le texte à quelqu'un : les mots d'abord, la voix suit",
+  "le son monte toucher le plafond, puis redescend vers toi",
+  "écoute-toi comme la voix de quelqu'un d'autre dans la pièce",
+  "chaque note se pose sur la précédente, comme des pas sur un sentier",
+  "laisse le son voyager plus loin que ton regard",
 ];
 function todayFocus(){ const d=new Date(); const n=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5); return FOCUS[n%FOCUS.length]; }
 const REST_DAYS = [6];
@@ -767,6 +772,16 @@ const STAGE = { theme:"Express", accent:"#F0B72E", ink:"#241a00",
     {t:"Attaques équilibrées", s:60, c:[`Onsets nets sur « é »`,`Ni soufflé, ni dur`]},
     {t:"Justesse — gamme 5 notes", s:100, c:[`Gammes appel-réponse`,`Cale l’oreille et la voix`]},
   ]};
+const CALM = { theme:"Détente", accent:"#9C8FD4", ink:"#150f24",
+  obj:"Voix tendue, qui sort haute et détimbrée ? Le stress fait monter le larynx et remonter la respiration. On redescend les deux, dans l’ordre.",
+  steps:[
+    {t:"Détente — corps & respiration basse", s:90, c:[`Épaules, mâchoire, nuque : relâche`,`Respiration basse et lente, sans son`]},
+    {t:"Détente — bâillement-soupir", s:90, c:[`Bâille franchement, puis soupire en descendant`,`Le bâillement fait redescendre le larynx`]},
+    {t:"Détente — sirènes « ou »", s:90, c:[`Descentes douces sur « ou »`,`Rien à prouver — on laisse tomber le son`]},
+    {t:"Voix parlée → chantée", s:120, c:[`Parle, puis chante sur la note`,`Retrouve la densité de ta voix qui parle`]},
+    {t:"Poitrine — descentes parlées", s:110, c:[`Voix pleine, mezzo-forte`,`Le timbre revient par le grave`]},
+    {t:"Retour au calme", s:60, c:[`Fredonnement descendant`,`Termine détendu, sans juger`]},
+  ]};
 
 /* =========================================================
    STOCKAGE — 3 étages : window.storage (artifact Claude)
@@ -789,18 +804,34 @@ const Store = {
   async getJSON(k,fb){ const v=await this.get(k); if(v==null) return fb; try{return JSON.parse(v);}catch(e){return fb;} },
   async setJSON(k,o){ await this.set(k,JSON.stringify(o)); },
 };
-const K_LOGS="voix:logs:v1", K_PREFS="voix:prefs:v1", K_TOPS="voix:tops:v1";
+const K_LOGS="voix:logs:v1", K_PREFS="voix:prefs:v1", K_TOPS="voix:tops:v1", K_AB="voix:aband:v1";
+const WARMUPS=new Set(["Souffle & appui","SOVT — paille & lip trills","SOVT — sirènes larges","Échauffement express","SOVT — paille"]);
+// Le « sommet validé » ne mesure que les exercices d'étendue (pas l'oreille ni l'ancrage grave)
+function isRangeEx(t){ return !/^(Oreille|Détente|Voix parlée|Ancrage)/.test(t); }
 
 /* =========================================================
    AUDIO — petits bips Web Audio
    ========================================================= */
 let AC=null;
-function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ AC=null; } } if(AC&&AC.state==="suspended") AC.resume(); return AC; }
+let MASTER=null;
+function audio(){
+  if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ AC=null; } }
+  if(AC&&AC.state==="suspended") AC.resume();
+  if(AC&&!MASTER){ // charte G7 : tout le son passe par gain → limiteur (boost sans saturation)
+    const g=AC.createGain(); g.gain.value=S.boost||1;
+    const lim=AC.createDynamicsCompressor();
+    lim.threshold.value=-3; lim.knee.value=0; lim.ratio.value=20; lim.attack.value=.002; lim.release.value=.2;
+    g.connect(lim); lim.connect(AC.destination); MASTER=g;
+  }
+  return AC;
+}
+function outNode(){ audio(); return MASTER||AC.destination; }
+function setBoost(v){ S.boost=v; if(MASTER&&AC) MASTER.gain.setTargetAtTime(v,AC.currentTime,.03); savePrefs(); }
 function tone(freq,start,dur,gain){
   const c=audio(); if(!c||S.muted) return;
   const o=c.createOscillator(), g=c.createGain();
   o.type="sine"; o.frequency.value=freq;
-  o.connect(g); g.connect(c.destination);
+  o.connect(g); g.connect(outNode());
   const t=c.currentTime+start;
   g.gain.setValueAtTime(0,t);
   g.gain.linearRampToValueAtTime(gain,t+.02);
@@ -816,7 +847,11 @@ function chimeEnd(){ tone(523.25,0,.5,.2); tone(659.25,.16,.5,.2); tone(783.99,.
 let wakeLock=null;
 async function lockScreen(){ try{ if("wakeLock" in navigator){ wakeLock=await navigator.wakeLock.request("screen"); } }catch(e){} }
 function unlockScreen(){ try{ if(wakeLock){ wakeLock.release(); wakeLock=null; } }catch(e){} }
-document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && S.screen==="session" && S.running) lockScreen(); });
+document.addEventListener("visibilitychange",()=>{
+  if(S.screen!=="session") return;
+  if(document.visibilityState==="hidden"){ if(S.running){ togglePause(); S._autoPaused=true; } }
+  else { if(S.running) lockScreen(); if(S._autoPaused){ S._autoPaused=false; announce("Séance en pause — appuie sur lecture pour reprendre"); } }
+});
 
 /* =========================================================
    ÉTAT
@@ -858,7 +893,8 @@ function hasTodayLog(){ return S.logs.some(l=>l.date===todayKey()); }
 function renderHome(){
   S.screen="home"; S.mode="week"; unlockScreen();
   const wk=WEEKS[S.week]; setAccent(wk.accent,wk.ink);
-  const dur=wk.steps.reduce((a,s)=>a+S.prepSecs+exDurMs(s)/1000,0);
+  const todaySteps=weekSteps();
+  const dur=todaySteps.reduce((a,s)=>a+S.prepSecs+exDurMs(s)/1000,0);
   const isRec=REC_DAYS.includes(S.day), isRest=REST_DAYS.includes(S.day);
   const mo=monthOf(S.week);
 
@@ -910,7 +946,7 @@ function renderHome(){
     </div>
 
     <div class="meta-line">
-      <span>≈ ${Math.round(dur/60)} min · ${wk.steps.length} étapes</span>
+      <span>≈ ${Math.round(dur/60)} min · ${todaySteps.length} étapes</span>
       ${hasTodayLog()?`<span class="today-done">✓ séance faite aujourd’hui</span>`:""}
     </div>
 
@@ -945,6 +981,7 @@ function renderHome(){
     <div class="quick-row">
       <button class="quick" id="startVfe">🔬<span>VFE</span></button>
       <button class="quick" id="startStage">🎭<span>Express</span></button>
+      <button class="quick" id="startCalm">🧘<span>Détente</span></button>
     </div>
   `;
 
@@ -959,6 +996,7 @@ function renderHome(){
   app.querySelector("#startOff").onclick=()=>startSession("off");
   app.querySelector("#startVfe").onclick=()=>startSession("vfe");
   app.querySelector("#startStage").onclick=()=>startSession("stage");
+  app.querySelector("#startCalm").onclick=()=>startSession("calm");
   app.querySelector("#goProg").onclick=()=>renderProgress();
   app.querySelector("#openToolsTop").onclick=openTools;
   refreshToolsTriggers();
@@ -967,15 +1005,47 @@ function renderHome(){
 /* =========================================================
    SESSION — moteur + écran
    ========================================================= */
-function modeSrc(m){ return m==="off"?OFF : m==="vfe"?VFE : m==="stage"?STAGE : WEEKS[S.week]; }
-function modeLabel(){ return S.mode==="off"?"Jour OFF" : S.mode==="vfe"?"VFE" : S.mode==="stage"?"Express scène" : ("S"+S.week+" · J"+S.day); }
+/* Séance du jour = semaine du programme + rappel espacé + application sur ta chanson */
+function pickReview(){
+  if(S.week<2) return null;
+  const cur=new Set(WEEKS[S.week].steps.map(x=>x.t)), seen=new Map();
+  for(let w=1;w<S.week;w++) WEEKS[w].steps.forEach(x=>seen.set(x.t,w));
+  const pool=[...seen.keys()].filter(t=>!cur.has(t) && SPEC[t]
+    && !/^(Détente|Retour|VFE|Réveil|SOVT|Souffle|Échauffement|Application|Diction)/.test(t)
+    && buildPhasesRaw({t,s:60,c:[]}).some(p=>p.mode==="sing"));
+  if(!pool.length) return null;
+  const since=Date.now()-7*864e5, ko={};   // 1) faiblesse récente : les ✗ des 7 derniers jours
+  (S.logs||[]).forEach(l=>{ if(l.ts>=since && l.koEx) Object.entries(l.koEx).forEach(([t,n])=>{ ko[t]=(ko[t]||0)+n; }); });
+  const weak=pool.filter(t=>ko[t]).sort((a,b)=>ko[b]-ko[a]);
+  if(weak.length) return {t:weak[0], why:"weak", n:ko[weak[0]]};
+  const aged=pool.map(t=>({t,last:seen.get(t)})).sort((a,b)=>a.last-b.last||a.t.localeCompare(b.t)); // 2) espacement
+  const pick=aged[((S.week-1)*7+S.day-1)%aged.length]; // rotation sur tout le vécu : espacement qui s’allonge avec le programme
+  return {t:pick.t, why:"spaced", ago:S.week-pick.last};
+}
+function weekSteps(){
+  const base=WEEKS[S.week].steps.slice(), r=pickReview();
+  if(r){
+    let at=0; for(let i=0;i<Math.min(3,base.length);i++) if(WARMUPS.has(base[i].t)) at=i+1;
+    base.splice(at,0,{t:r.t, s:75, review:true,
+      c:[ r.why==="weak" ? `Rappel ciblé : ${r.n} ✗ sur cet exercice ces 7 derniers jours` : `Rappel espacé : travaillé il y a ${r.ago} semaine${r.ago>1?"s":""} — on le réactive avant l’oubli`, `2 rounds seulement, qualité maximale`],
+      tip:`Revenir sur un geste après un délai l’ancre plus durablement que le répéter en bloc.`});
+  }
+  if(!base.some(x=>x.t==="Application répertoire")){
+    const iEnd=base.findIndex(x=>x.t==="Retour au calme");
+    base.splice(iEnd<0?base.length:iEnd,0,{t:"Application — ta chanson", s:140,
+      c:[`Un passage de ta chanson avec la technique du jour`,`Son d’exercice → voyelles seules → texte`], tip:`Un exercice ne sert que s’il passe dans la chanson.`});
+  }
+  return base;
+}
+function modeSrc(m){ return m==="off"?OFF : m==="vfe"?VFE : m==="stage"?STAGE : m==="calm"?CALM : WEEKS[S.week]; }
+function modeLabel(){ return S.mode==="off"?"Jour OFF" : S.mode==="vfe"?"VFE" : S.mode==="stage"?"Express scène" : S.mode==="calm"?"Détente" : ("S"+S.week+" · J"+S.day); }
 function startSession(mode){
   audio(); // débloque l'audio sur le geste utilisateur
   S.mode=mode;
   const src = modeSrc(mode);
   setAccent(src.accent,src.ink);
-  S.steps=src.steps; S.running=true; S.screen="session";
-  S.idx=0; S.tr=0; S.trAuto=0; S.sessTop=null; S.vfeHolds=[]; S.rateOkN=0; S.rateKoN=0; S.koEx={}; S.phases=buildPhases(S.steps[0]); S.pidx=0;
+  S.steps=(mode==="week")?weekSteps():src.steps; S.running=true; S.screen="session";
+  S.idx=0; S.tr=0; S.trAuto=0; S.sessTop=null; S.vfeHolds=[]; S.rateOkN=0; S.rateKoN=0; S.koEx={}; S.singN=0; S.skipN=0; S.activeMs=0; S.lastTick=0; S.stepT0=Date.now(); S.wuOk=false; S.phases=buildPhases(S.steps[0]); S.pidx=0;
   S.phase="prep"; S.prepMs=S.prepSecs*1000; S.remMs=S.phases[0].sec*1000;
   S.endAt=Date.now()+S.prepMs;
   renderSession();
@@ -990,6 +1060,7 @@ function stopTick(){ if(tick){ clearInterval(tick); tick=null; } }
 
 function onTick(){
   if(!S.running) return;
+  const nowT=Date.now(); if(S.lastTick) S.activeMs=(S.activeMs||0)+Math.min(1000,nowT-S.lastTick); S.lastTick=nowT;
   const left = S.endAt - Date.now();
   if(CH.on){ const b=document.getElementById("chronoBtn"); if(b) b.textContent="⏹ "+((performance.now()-CH.t0)/1000).toFixed(1)+" s"; }
   if(S.phase==="prep"){ S.prepMs=left; if(left<=0){ beginRun(); return; } }
@@ -1000,7 +1071,7 @@ function onTick(){
 // Entre dans un EXERCICE : d'abord un court temps de lecture (prep), puis ses phases
 function enterStep(i){
   stopModel(); stopHold(); stopSiren();
-  S.idx=i; S.tr=0; S.trAuto=0; S.phases=buildPhases(S.steps[i]); S.pidx=0;
+  S.idx=i; S.tr=0; S.trAuto=0; S.stepT0=Date.now(); S.phases=buildPhases(S.steps[i]); S.pidx=0;
   S.phase="prep"; S.prepMs=S.prepSecs*1000; S.remMs=S.phases[0].sec*1000;
   if(S.running) S.endAt=Date.now()+S.prepMs;
   paintStep(); paintPhase(); paintTimer(); paintPlay(); paintControls(); paintRate(); paintChrono(); paintRec();
@@ -1017,9 +1088,10 @@ function enterPhase(j){
   phaseCue(ph.mode);
   if(ph.mode==="listen"){ playPhaseModel(ph.play); }
   else if(ph.mode==="sing"){
+    S.singN=(S.singN||0)+1;
     const isEar=S.steps[S.idx].t.startsWith("Oreille");
     if(ph.sustain){ startHold((ph.note||48)+totTr(), ph.sec); }
-    else if(S.duo && ph.play && !isEar){ setTimeout(()=>{ if(S.running&&S.phase==="run"&&S.pidx===j) playPhaseModel(ph.play); }, 150); }
+    else if(S.duo && ph.play && !isEar && !duoFaded(j)){ setTimeout(()=>{ if(S.running&&S.phase==="run"&&S.pidx===j) playPhaseModel(ph.play); }, 150); }
     else if(ph.ref){ setTimeout(()=>{ if(S.running&&S.phase==="run"&&S.pidx===j) playNoteRef((ph.note||48)+totTr()); }, 150); }
   }
   else if(ph.mode==="siren"){ const gd=ph.guide||[45,57]; startSiren(gd[0]+totTr(), gd[1]+totTr(), ph.sec, ph.dir); }
@@ -1042,14 +1114,21 @@ function nextStep(auto){
   enterStep(S.idx+1);
 }
 // navigation manuelle
-function navNext(){ if(S.phase==="prep"){ beginRun(); return; } nextPhase(false); }
+function navNext(){
+  if(S.mode==="week" && WARMUPS.has(S.steps[S.idx].t) && !S.wuOk && Date.now()-(S.stepT0||0)<45000){
+    if(!confirm("Sauter l’échauffement ? Une voix froide apprend mal et se fatigue vite.")) return;
+    S.wuOk=true;
+  }
+  if(S.phase==="run") S.skipN=(S.skipN||0)+1;
+  if(S.phase==="prep"){ beginRun(); return; } nextPhase(false);
+}
 function navPrev(){
   if(S.phase==="run" && S.pidx>0){ enterPhase(S.pidx-1); return; }
   enterStep(Math.max(0,S.idx-1));
 }
 
 function togglePause(){
-  S.running=!S.running;
+  S.running=!S.running; S.lastTick=0;
   const key = S.phase==="prep" ? "prepMs" : "remMs";
   if(S.running){ S.endAt=Date.now()+S[key]; startTick(); lockScreen(); if(S.phase==="run") resumePhaseAudio(); }
   else { S[key]=Math.max(0,S.endAt-Date.now()); stopTick(); stopModel(); stopHold(); stopSiren(); }
@@ -1160,7 +1239,7 @@ function renderSession(){
       </div>
     </div>
   `;
-  app.querySelector("#quit").onclick=()=>{ stopTick(); stopModel(); stopHold(); stopSiren(); recCleanup(); unlockScreen(); renderHome(); };
+  app.querySelector("#quit").onclick=()=>{ logAbandon(); stopTick(); stopModel(); stopHold(); stopSiren(); recCleanup(); unlockScreen(); renderHome(); };
   app.querySelector("#prev").onclick=navPrev;
   app.querySelector("#next").onclick=navNext;
   app.querySelector("#play").onclick=onCentral;
@@ -1191,7 +1270,7 @@ function buildSegs(){
 function paintStep(){
   const step=S.steps[S.idx];
   const title=document.getElementById("title"); if(!title) return;
-  title.textContent=step.t;
+  title.textContent=(step.review?"🔁 Rappel · ":"")+step.t;
   document.getElementById("cues").innerHTML=step.c.map(x=>`<li>${esc(x)}</li>`).join("");
   const tip=document.getElementById("tip"); tip.textContent=step.tip||""; tip.style.display=step.tip?"block":"none";
   stopModel();
@@ -1251,7 +1330,7 @@ function paintPhase(){
     else { banner.textContent=meta.txt; banner.style.color=meta.col; banner.style.borderColor=meta.col; }
   }
   const instr=document.getElementById("phaseInstr");
-  if(instr) instr.textContent = prep ? "Lis l’exercice — départ auto, ou ▶ pour démarrer" : (ph.label||"");
+  if(instr) instr.textContent = prep ? "Lis l’exercice — départ auto, ou ▶ pour démarrer" : (ph.label||"")+duoHint();
   // pendant la lecture (prep) : montrer les repères ; pendant une phase : les masquer
   const cues=document.getElementById("cues"), tip=document.getElementById("tip");
   if(cues) cues.style.display=prep?"block":"none";
@@ -1302,8 +1381,10 @@ function rateRound(ok){
   const t=S.steps[S.idx].t;
   if(ok){
     S.rateOkN=(S.rateOkN||0)+1;
-    if(S.sessTop==null||sung>S.sessTop) S.sessTop=sung;
-    if(S.tops[t]==null||sung>S.tops[t]){ S.tops[t]=sung; saveTops(); }
+    if(isRangeEx(t)){
+      if(S.sessTop==null||sung>S.sessTop) S.sessTop=sung;
+      if(S.tops[t]==null||sung>S.tops[t]){ S.tops[t]=sung; saveTops(); }
+    }
   } else {
     S.rateKoN=(S.rateKoN||0)+1;
     S.koEx=S.koEx||{}; S.koEx[t]=(S.koEx[t]||0)+1;
@@ -1312,12 +1393,20 @@ function rateRound(ok){
   nextPhase(false);
 }
 async function saveTops(){ await Store.setJSON(K_TOPS,S.tops); }
+async function logAbandon(){
+  if((S.activeMs||0)<60000) return;
+  S.aband=S.aband||[];
+  S.aband.unshift({date:todayKey(), ts:Date.now(), mode:S.mode, week:S.mode==="week"?S.week:null, day:S.mode==="week"?S.day:null,
+    prog:(S.idx+1)+"/"+S.steps.length, ex:S.steps[S.idx].t, min:Math.round(S.activeMs/60000), rateOk:S.rateOkN||0, rateKo:S.rateKoN||0});
+  if(S.aband.length>200) S.aband.length=200;
+  await Store.setJSON(K_AB,S.aband);
+}
 /* ===== EXPORT / IMPORT — sauvegarde et analyse hebdomadaire ===== */
 function exportPayload(){
   return JSON.stringify({
     app:"VOIX", v:1, exportedAt:new Date().toISOString(),
     profile:{level:S.level, cycle:S.cycle, week:S.week, day:S.day, goal:S.goal},
-    tops:S.tops, logs:S.logs,
+    tops:S.tops, logs:S.logs, aband:S.aband||[],
   });
 }
 async function copyExport(btn){
@@ -1351,6 +1440,7 @@ function importFilePick(ev){
       if(!confirm("Importer cet export ("+d.logs.length+" séances, du "+(d.exportedAt||"?").slice(0,10)+") ?\nTes données actuelles seront REMPLACÉES.")) return;
       S.logs=d.logs.slice(0,400).filter(l=>l&&l.date);
       S.tops=(d.tops&&typeof d.tops==="object"&&!Array.isArray(d.tops))?d.tops:{};
+      if(Array.isArray(d.aband)){ S.aband=d.aband.slice(0,200); await Store.setJSON(K_AB,S.aband); }
       const p=d.profile||{};
       if(p.level==="adv"||p.level==="std") S.level=p.level;
       if(Number.isInteger(p.cycle)&&p.cycle>=1&&p.cycle<=9) S.cycle=p.cycle;
@@ -1419,6 +1509,15 @@ function paintChrono(){
   const show=S.phase==="run" && !!curPhase().chrono;
   row.style.display=show?"flex":"none";
   if(!show && CH.on){ CH.on=false; const b=document.getElementById("chronoBtn"); if(b){ b.classList.remove("run"); b.textContent="⏱ Départ"; } }
+}
+function duoFaded(j){
+  const tot=S.phases.filter(p=>p.mode==="sing").length; if(tot<3) return false;
+  return S.phases.slice(0,j).filter(p=>p.mode==="sing").length >= Math.ceil(tot/2);
+}
+function duoHint(){
+  const ph=curPhase();
+  return (S.duo && S.phase==="run" && ph.mode==="sing" && ph.play && !ph.sustain
+    && !S.steps[S.idx].t.startsWith("Oreille") && duoFaded(S.pidx)) ? " · 🎹 Duo coupé : seul maintenant" : "";
 }
 function toggleExerciseDrone(){
   audio();
@@ -1500,7 +1599,7 @@ function renderEnd(){
       scTick=setInterval(()=>{ sc.textContent="⏹ "+((performance.now()-scT0)/1000).toFixed(1)+" s — re-tape à bout de souffle"; },100);
     } else {
       clearInterval(scTick); const d=Math.round((performance.now()-scT0)/1000); scT0=0; sc.classList.remove("run");
-      if(d>=3&&d<=120){ S.form.sssss=d; document.getElementById("ssVal").textContent=d; sc.textContent="✓ "+d+" s enregistré — remesure si tu veux"; }
+      if(d>=3&&d<=120){ S.form.sssss=d; S.form.ssM=true; document.getElementById("ssVal").textContent=d; sc.textContent="✓ "+d+" s enregistré — remesure si tu veux"; }
       else sc.textContent="⏱ Mesurer maintenant — inspire, tape, « sssss », re-tape";
     }
   };
@@ -1518,7 +1617,8 @@ function renderEnd(){
     S.logs.unshift({ date:todayKey(), ts:Date.now(),
       mode:S.mode, week:S.mode==="week"?S.week:null, day:S.mode==="week"?S.day:null,
       sssss:S.form.sssss, sens:S.form.sens, note:(S.form.note||"").trim(), top:S.sessTop??null, vfeBest:(S.vfeHolds.length?Math.max(...S.vfeHolds):null), vfeAvg:(S.vfeHolds.length?Math.round(10*S.vfeHolds.reduce((a,b)=>a+b,0)/S.vfeHolds.length)/10:null),
-      rateOk:S.rateOkN||0, rateKo:S.rateKoN||0, koEx:(S.koEx&&Object.keys(S.koEx).length?S.koEx:null) });
+      rateOk:S.rateOkN||0, rateKo:S.rateKoN||0, koEx:(S.koEx&&Object.keys(S.koEx).length?S.koEx:null),
+      min:Math.round((S.activeMs||0)/60000), sings:S.singN||0, skips:S.skipN||0, ssM:!!S.form.ssM });
     if(S.logs.length>400) S.logs.length=400;
     const v=S.form.sssss;
     const record = prevBest>0 && v>prevBest;
@@ -1534,14 +1634,15 @@ function renderEnd(){
    ÉCRAN — PROGRÈS
    ========================================================= */
 function streak(){
-  const days=[...new Set(S.logs.map(l=>l.date))].sort().reverse(); // récent -> ancien
+  // Série qui pardonne (charte P9) : un jour manqué entre deux séances ne casse rien.
+  const days=[...new Set(S.logs.map(l=>l.date))].sort().reverse();
   if(!days.length) return 0;
   const today=new Date(todayKey());
-  if(Math.round((today-new Date(days[0]))/86400000)>1) return 0; // dernière séance ni aujourd'hui ni hier
+  if(Math.round((today-new Date(days[0]))/86400000)>2) return 0;
   let st=1, prev=new Date(days[0]);
   for(let i=1;i<days.length;i++){
     const cur=new Date(days[i]);
-    if(Math.round((prev-cur)/86400000)===1){ st++; prev=cur; } else break;
+    if(Math.round((prev-cur)/86400000)<=2){ st++; prev=cur; } else break;
   }
   return st;
 }
@@ -1612,7 +1713,7 @@ function renderProgress(){
 
     <div class="stat-row">
       <div class="stat"><div class="v">${total}</div><div class="k">séances</div></div>
-      <div class="stat"><div class="v">${st}🔥</div><div class="k">jours d’affilée</div></div>
+      <div class="stat"><div class="v">${st}🔥</div><div class="k">série (1 jour de grâce)</div></div>
       <div class="stat"><div class="v">${bestSS}s</div><div class="k">meilleur souffle</div></div>
       <div class="stat"><div class="v">${bestTop!=null?midiName(bestTop):"—"}</div><div class="k">sommet validé</div></div>
     </div>
@@ -1700,6 +1801,7 @@ function ensureTools(){
   const panel=document.createElement("div"); panel.className="tools-panel"; panel.id="toolsPanel";
   panel.innerHTML=`
     <div class="tools-head"><h2>Outils</h2><button class="tools-x" id="toolsClose" aria-label="Fermer">✕</button></div>
+    ${boostBlockHTML()}
     ${droneBlockHTML()}
     ${metroBlockHTML()}
   `;
@@ -1708,6 +1810,7 @@ function ensureTools(){
   panel.querySelector("#toolsClose").onclick=closeTools;
   wireDrone();
   wireMetro();
+  panel.querySelectorAll("#boostOpts button").forEach(b=>b.onclick=()=>{ setBoost(+b.dataset.b); panel.querySelectorAll("#boostOpts button").forEach(x=>x.classList.toggle("on",x===b)); });
   T.built=true;
 }
 function openTools(){
@@ -1723,6 +1826,14 @@ function closeTools(){
 
 /* ---- DRONE ---- */
 function droneFreq(){ return A3*Math.pow(2,T.drone.semi/12); }
+function boostBlockHTML(){ return `
+  <div class="tool" id="toolBoost">
+    <div class="tool-head"><div class="tool-name"><span class="em">🔊</span> Volume général</div></div>
+    <div class="tool-body">
+      <div class="prep-opts" id="boostOpts">${[1,1.5,2,3].map(v=>`<button data-b="${v}" class="${(S.boost||1)==v?'on':''}">×${v}</button>`).join("")}</div>
+      <div class="data-hint">Amplifie tout (piano, bourdon, sirènes). Un limiteur empêche la saturation.</div>
+    </div>
+  </div>`; }
 function droneBlockHTML(){ return `
   <div class="tool" id="toolDrone">
     <div class="tool-head">
@@ -1767,7 +1878,7 @@ function toggleDrone(){
 function droneStart(){
   const c=audio(); if(!c) return;
   const f=droneFreq();
-  T.drone.gain=c.createGain(); T.drone.gain.gain.value=0; T.drone.gain.connect(c.destination);
+  T.drone.gain=c.createGain(); T.drone.gain.gain.value=0; T.drone.gain.connect(outNode());
   T.drone.osc=c.createOscillator(); T.drone.osc.type="triangle"; T.drone.osc.frequency.value=f;
   T.drone.osc2=c.createOscillator(); T.drone.osc2.type="sine"; T.drone.osc2.frequency.value=f; T.drone.osc2.detune.value=-3;
   const g2=c.createGain(); g2.gain.value=.55;
@@ -1855,7 +1966,7 @@ function clickAt(t, accent){
   const c=audio(); if(!c) return;
   const o=c.createOscillator(), g=c.createGain();
   o.type="square"; o.frequency.value=accent?1700:1150;
-  o.connect(g); g.connect(c.destination);
+  o.connect(g); g.connect(outNode());
   g.gain.setValueAtTime(0,t);
   g.gain.linearRampToValueAtTime(accent?.26:.16,t+.004);
   g.gain.exponentialRampToValueAtTime(.0001,t+.05);
@@ -1941,8 +2052,8 @@ function crSus(root, rounds, opt={}){
 
 // descripteurs par titre d'étape (root MIDI ; Do3=48 ; ténor). f = mel / sus / seq
 const SPEC={
-  "Attaques équilibrées":{f:"sus",root:52,rounds:6,holdSec:5,listenLabel:"La cible",singLabel:"Onset « é » net et instantané — bord des cordes franc, ni soufflé ni dur"},
-  "Justesse — note tenue (drone)":{f:"sus",root:53,rounds:6,holdSec:8,listenLabel:"La cible",singLabel:"Son filé : justesse au centre, vibrato libre et régulier"},
+  "Attaques équilibrées":{f:"sus",root:52,rounds:6,holdSec:5,listenLabel:"La cible",singLabel:"Onset « é » net et instantané, comme une balle lancée pile sur une cible — ni soufflé ni dur"},
+  "Justesse — note tenue (drone)":{f:"sus",root:53,rounds:6,holdSec:8,listenLabel:"La cible",singLabel:"Son filé qui remplit la pièce jusqu'au mur d'en face — pose-toi au centre de la note"},
   "Justesse — gamme 5 notes":{f:"mel",pat:"scale5",root:53,rounds:7,tempo:100,singLabel:"Gamme legato, voyelle pure, chaque degré exact"},
   "Justesse — intervalles":{f:"mel",pat:"arpUpDown",root:53,rounds:7,tempo:108,singLabel:"Arpège d'octave — tierce et quinte justes, octave ouverte"},
   "Résonance — ng → a":{f:"sus",root:55,rounds:6,holdSec:7,listenLabel:"La cible",singLabel:"« ng »→« a » : garde le squillo (≈3 kHz) en ouvrant la voyelle"},
@@ -1955,7 +2066,7 @@ const SPEC={
       ...crMel("arp9", r0, n, {tempo:Math.round(100*lvTempo()), singLabel:"« goug » presque parlé, tout doux — le OU reste FERMÉ jusqu'en haut (petit et connecté = parfait)"}),
     ];
   }},
-  "Agilité — gammes rapides":{f:"mel",pat:"scale9",root:52,rounds:6,tempo:152,singLabel:"Run de neuvième — léger, articulé, larynx stable, à tempo"},
+  "Agilité — gammes rapides":{f:"mel",pat:"scale9",root:52,rounds:6,tempo:152,singLabel:"Run de neuvième, léger et articulé — chaque note lancée droit devant, à tempo"},
   "Agilité — staccato":{f:"mel",pat:"arp9",root:52,rounds:6,tempo:138,art:"staccato",singLabel:"Staccato sur la 10e — appui constant, attaques perlées"},
   "Nuances — messa di voce":{f:"sus",root:55,rounds:5,holdSec:16,singLabel:"Messa di voce : pp→ff→pp, hauteur et timbre immobiles"},
   "Agilité — mélisme":{f:"fn",make:()=>[
@@ -1995,7 +2106,20 @@ const SPEC={
     {mode:"listen",sec:3,play:{note:n,art:"sustain"},note:n,label:"La note"},
     {mode:"do",sec:45,chrono:true,note:n,label:"« ol » tenu au MAXIMUM — chronomètre, puis note suivante"},
   ])},
+  "Application — ta chanson":{f:"seq",phases:[
+    {mode:"do",sec:40,label:"Choisis UN passage de ta chanson du moment. Chante sa mélodie exacte sur le son d'exercice du jour (lip trill, « goug » ou « ng »), sans les mots."},
+    {mode:"do",sec:40,label:"Même passage sur les voyelles seules, consonnes retirées — garde exactement la sensation de l'exercice."},
+    {mode:"do",sec:60,label:"Remets le texte et raconte l'histoire à quelqu'un au fond de la salle. Si ça casse, reviens à l'étape précédente."}]},
   "Réveil — sirènes":{f:"seq",phases:[{mode:"siren",guide:[43,62],sec:90,label:"Paille ou lip trills — suis la sirène, réveille toute l’étendue sans forcer"}]},
+  /* — DÉTENTE : faire redescendre larynx et respiration après le stress — */
+  "Détente — corps & respiration basse":{f:"seq",phases:[
+    {mode:"do",sec:30,label:"Debout, relâche : épaules qui tombent, mâchoire pendante, nuque longue. Secoue les bras. Rien à chanter."},
+    {mode:"do",sec:60,label:"Respiration basse : inspire 4 s par le nez (le ventre s'ouvre, épaules IMMOBILES), expire 8 s par la bouche. Répète — l'expiration longue calme le système nerveux."}]},
+  "Détente — bâillement-soupir":{f:"seq",phases:[
+    {mode:"do",sec:30,label:"Bâille franchement, bouche grande ouverte — sens l'espace qui s'ouvre au fond et le larynx qui DESCEND. Répète 3-4 fois."},
+    {mode:"siren",dir:"down",guide:[45,60],sec:60,label:"Bâillement-soupir : pars du haut sur un soupir sonore « haaa » et laisse tomber jusqu'en bas, comme un soulagement. Aucune intention de bien chanter."}]},
+  "Détente — sirènes « ou »":{f:"seq",phases:[
+    {mode:"siren",dir:"down",guide:[45,58],sec:90,label:"Descentes douces sur « ou » — lèvres arrondies, gorge ouverte, volume faible. Le son tombe tout seul, tu ne le pilotes pas."}]},
   /* — ANCRAGE POITRINE : ramener le corps du son (muscle TA) — */
   "Voix parlée → chantée":{f:"fn",make:()=>[
     {mode:"do",sec:20,label:"PARLE d'abord : dis une phrase à voix haute, normalement. Écoute-la — elle est timbrée, dense, pas soufflée. C'est CE son qu'on transporte dans le chant."},
@@ -2080,6 +2204,12 @@ function adaptRoot(title, base, rounds){
 // Récupération physiologique après les exercices les plus coûteux
 const RECOVER_AFTER=new Set(["Agilité — gammes rapides","Agilité — staccato","Agilité — mélisme","Nuances — messa di voce","Passaggio — goug / mum","Résonance — nay nay nay"]);
 function buildPhases(step){
+  if(step.review){ // rappel : 2 rounds seulement (+ vérification d'oreille éventuelle)
+    const raw=buildPhasesRaw(step), out=[]; let n=0;
+    for(let i=0;i<raw.length;i++){ out.push(raw[i]);
+      if(raw[i].mode==="sing" && ++n>=2){ const nx=raw[i+1]; if(nx && /^Vérification/.test(nx.label||"")) out.push(nx); break; } }
+    return out;
+  }
   const out=buildPhasesRaw(step);
   if(RECOVER_AFTER.has(step.t)) out.push({mode:"do",sec:15,label:"Récupération — souffle silencieux par le nez, épaules relâchées, déglutis, secoue doucement la mâchoire"});
   return out;
@@ -2099,7 +2229,7 @@ function exDurMs(step){ return buildPhases(step).reduce((a,p)=>a+p.sec*1000,0); 
 let modelNodes=[], modelPlayTO=null;
 function pianoNote(freq,t,len){
   const c=audio(); if(!c||S.muted) return;
-  const g=c.createGain(); g.connect(c.destination);
+  const g=c.createGain(); g.connect(outNode());
   const oscs=[[1,.5,"triangle"],[2,.16,"sine"],[3,.07,"sine"]].map(([mu,a,tp])=>{
     const o=c.createOscillator(); o.type=tp; o.frequency.value=freq*mu;
     const og=c.createGain(); og.gain.value=a; o.connect(og); og.connect(g);
@@ -2126,7 +2256,7 @@ function playNoteRef(midi){ audio(); stopModel(); pianoNote(midiToFreq(midi), au
 let holdNodes=null;
 function startHold(midi, durSec){
   stopHold(); const c=audio(); if(!c||S.muted) return;
-  const g=c.createGain(); g.gain.value=0; g.connect(c.destination);
+  const g=c.createGain(); g.gain.value=0; g.connect(outNode());
   const o=c.createOscillator(); o.type="triangle"; o.frequency.value=midiToFreq(midi);
   const o2=c.createOscillator(); o2.type="sine"; o2.frequency.value=midiToFreq(midi); o2.detune.value=-3;
   const g2=c.createGain(); g2.gain.value=.5; o.connect(g); o2.connect(g2); g2.connect(g);
@@ -2148,7 +2278,7 @@ let sirenNodes=null;
 function startSiren(loM, hiM, durSec, dir){
   stopSiren(); const c=audio(); if(!c||S.muted) return;
   const lo=midiToFreq(loM), hi=midiToFreq(Math.max(loM+2,hiM));
-  const g=c.createGain(); g.gain.value=0; g.connect(c.destination);
+  const g=c.createGain(); g.gain.value=0; g.connect(outNode());
   const o=c.createOscillator(); o.type="triangle"; o.connect(g);
   const og=c.createGain(); og.gain.value=.5; const o2=c.createOscillator(); o2.type="sine"; o2.connect(og); og.connect(g);
   const t0=c.currentTime+.05, end=t0+durSec, V=.17;
@@ -2214,6 +2344,30 @@ function markPlaying(dur){
    « COMMENT FAIRE ? » — explications détaillées par étape
    ========================================================= */
 const HOW={
+  "Application — ta chanson":[
+    "Un exercice ne sert que s'il passe dans ta chanson. Le transfert n'est pas automatique : on devient bon dans ce qu'on pratique, dans les conditions où on le pratique. Cette étape construit le pont chaque jour, en 2 minutes.",
+    "Étape 1 : la mélodie exacte d'un passage, sur le son d'exercice du jour (lip trill, « goug », « ng »). Le son facilitant fait passer la phrase sans l'obstacle des consonnes.",
+    "Étape 2 : voyelles seules. Tu gardes la ligne et la sensation, tu ajoutes la couleur des voyelles du texte.",
+    "Étape 3 : le texte complet, adressé à quelqu'un. Si le passage recasse, ce n'est pas un échec : reviens à l'étape qui marchait, puis remonte.",
+    "Choisis le passage selon la semaine : un aigu en semaine d'étendue, une phrase longue en semaine de souffle, un passage doux en semaine de nuances. Pour l'émission, ta chanson de casting est le candidat idéal.",
+  ],
+  "Détente — corps & respiration basse":[
+    "Sous stress, le corps bascule en mode alerte : la respiration remonte dans le haut du thorax (respiration claviculaire) et les muscles du cou se contractent. Résultat pour un chanteur : plus d'appui bas, larynx qui monte, voix qui sort haute et fine. Ce n'est pas ta technique qui a disparu — c'est ton système nerveux qui a changé de réglage.",
+    "L'ordre compte : on relâche le corps AVANT de chercher le son. Épaules qui tombent, mâchoire pendante (dents desserrées), nuque longue, bras secoués.",
+    "L'expiration longue (4 s inspire / 8 s expire) active le système parasympathique — c'est le levier physiologique le plus rapide pour faire redescendre le stress. Trois minutes suffisent à changer l'état.",
+    "Aucun son pendant cet exercice : le but est de retrouver l'appui bas, pas de tester ta voix. Tester ta voix quand tu es tendu ne fait qu'ajouter de l'anxiété.",
+  ],
+  "Détente — bâillement-soupir":[
+    "Le bâillement est le geste anti-stress le plus efficace pour la voix : il abaisse mécaniquement le larynx, ouvre le pharynx et détend la base de langue — exactement les trois choses que le stress verrouille.",
+    "Bâille pour de vrai, largement, plusieurs fois. Puis, sur un soupir sonore « haaa », laisse le son TOMBER du haut vers le bas, comme un soulagement de fin de journée.",
+    "Consigne mentale essentielle : aucune intention de « bien chanter ». C'est un relâchement, pas une performance. Si tu t'écoutes pour juger, tu réintroduis la tension que tu essaies d'enlever.",
+    "Signe que ça marche : le son devient plus rond, plus grave, plus large — et bâiller devient contagieux. C'est le larynx qui redescend à sa place.",
+  ],
+  "Détente — sirènes « ou »":[
+    "Le « ou » (lèvres arrondies, espace intérieur haut) est la voyelle la plus détendante : elle garde le conduit ouvert sans demander d'effort. En descente, elle ramène naturellement le son vers le mécanisme de poitrine.",
+    "Volume faible, mouvement lent : tu ne pilotes pas le son, tu le laisses tomber. Comme si tu soufflais dans un tube.",
+    "C'est la transition entre la détente pure et le retour au chant : après ces sirènes, ta voix parlée-chantée devrait revenir facilement. Si ce n'est pas le cas, refais un tour de bâillements plutôt que d'insister.",
+  ],
   "Voix parlée → chantée":[
     "L'exercice le plus important si ta voix chantée est plus soufflée/légère que ta voix parlée. Ta voix qui parle est la PREUVE que ton muscle de poitrine fonctionne parfaitement — le problème n'est donc pas musculaire, c'est un mode que tu quittes dès que tu « passes en mode chant ».",
     "Étape 1 : parle une phrase normalement, à voix haute. Mémorise la sensation : dense, timbrée, appuyée sur rien de spécial.",
@@ -2537,7 +2691,7 @@ function celebrateSound(){
 /* =========================================================
    PERSISTANCE position + prefs
    ========================================================= */
-async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal,level:S.level,cycle:S.cycle,duo:!!S.duo}); }
+async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal,level:S.level,cycle:S.cycle,duo:!!S.duo,boost:S.boost||1}); }
 
 /* =========================================================
    BOOT
@@ -2553,8 +2707,10 @@ async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.we
     if(prefs.goal>=10&&prefs.goal<=120) S.goal=prefs.goal;
     if(Number.isInteger(prefs.cycle)&&prefs.cycle>=1&&prefs.cycle<=9) S.cycle=prefs.cycle;
     if(typeof prefs.duo==="boolean") S.duo=prefs.duo;
+    if([1,1.5,2,3].includes(prefs.boost)) S.boost=prefs.boost;
   }
   S.tops=await Store.getJSON(K_TOPS,{}) || {};
+  S.aband=await Store.getJSON(K_AB,[]) || [];
   S.logs=await Store.getJSON(K_LOGS,[]) || [];
   renderHome();
 })();
