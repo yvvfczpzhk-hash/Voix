@@ -391,6 +391,20 @@
   .rec-btn,.how-btn,.data-btn,.pill,.chrono-btn,.ss-chrono,.rate-btn{min-height:44px}
   /* G7 — mouvement réduit respecté */
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  .reprise-tag{display:flex;flex-direction:column;gap:6px;margin:0 0 16px;padding:12px 14px;border-radius:14px;
+    background:color-mix(in srgb,#9C8FD4 14%,var(--surface));border:1px solid #9C8FD4;font-size:.82rem;color:var(--muted)}
+  .reprise-tag b{color:var(--ink);font-size:.88rem}
+  .reprise-tag button{align-self:flex-start;min-height:44px;padding:8px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);font-weight:700;font-size:.78rem}
+  /* Zone d'action épinglée en haut de l'écran (✓/✗ et chrono accessibles sans défiler) */
+  .act-slot{position:sticky;top:max(8px,env(safe-area-inset-top));z-index:6;margin:10px 0 6px;padding:10px 10px 8px;border-radius:18px;
+    border:1px solid var(--border);background:color-mix(in srgb,var(--bg) 62%,transparent);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  .act-slot .rate-row{margin:0 auto;max-width:360px}
+  .act-slot .rate-btn{max-width:175px;min-height:54px;font-size:1.02rem;transition:opacity .2s ease,filter .2s ease}
+  .act-slot .rate-row.idle .rate-btn,.act-slot .chrono-row.idle .chrono-btn{opacity:.32;filter:saturate(.3);pointer-events:none}
+  .act-slot .rate-hint{margin:6px auto 0;min-height:2.9em;display:flex;align-items:center;justify-content:center}
+  .act-slot .chrono-row{margin:0 auto}
+  .act-slot .rate-row+.rate-hint+.chrono-row{margin-top:8px}
 </style>
 </head>
 <body>
@@ -805,7 +819,10 @@ const Store = {
   async setJSON(k,o){ await this.set(k,JSON.stringify(o)); },
 };
 const K_LOGS="voix:logs:v1", K_PREFS="voix:prefs:v1", K_TOPS="voix:tops:v1", K_AB="voix:aband:v1";
-const WARMUPS=new Set(["Souffle & appui","SOVT — paille & lip trills","SOVT — sirènes larges","Échauffement express","SOVT — paille"]);
+const WARMUPS=new Set(["Souffle & appui","SOVT — paille & lip trills","SOVT — sirènes larges","Échauffement express","SOVT — paille",
+  "VFE 1 — Tenue maximale « i »","VFE 2 — Glissé grave → aigu","VFE 3 — Glissé aigu → grave","VFE 4 — Cinq tenues maximales"]);
+// Jours VFE (Stemple) : le protocole sert d'échauffement — 2×/semaine en mois 2-3, 1×/semaine en mois 4
+const VFE_DAYS={5:[2,5],6:[2,5],7:[2,5],9:[2,5],10:[2,5],11:[2,5],13:[2],14:[2],15:[2],16:[2]};
 // Le « sommet validé » ne mesure que les exercices d'étendue (pas l'oreille ni l'ancrage grave)
 function isRangeEx(t){ return !/^(Oreille|Détente|Voix parlée|Ancrage)/.test(t); }
 
@@ -891,7 +908,7 @@ function todayKey(){ const d=new Date(); return d.toISOString().slice(0,10); }
 function hasTodayLog(){ return S.logs.some(l=>l.date===todayKey()); }
 
 function renderHome(){
-  S.screen="home"; S.mode="week"; unlockScreen();
+  S.screen="home"; S.mode="week"; unlockScreen(); checkReprise();
   const wk=WEEKS[S.week]; setAccent(wk.accent,wk.ink);
   const todaySteps=weekSteps();
   const dur=todaySteps.reduce((a,s)=>a+S.prepSecs+exDurMs(s)/1000,0);
@@ -927,6 +944,7 @@ function renderHome(){
       </div>
     </div>
     <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+    ${repriseOn()?`<div class="reprise-tag"><b>🩹 Reprise après une pause — séance ${4-S.reprise.left}/3</b><span>Tout 2 demi-tons plus bas, moins de rounds. La voix se reconditionne avant de recharger.</span><button id="repriseOff">Je suis prêt, reprise terminée</button></div>`:""}
 
     <div class="eyebrow">Mois</div>
     <div class="months">${monthChips}</div>
@@ -990,6 +1008,7 @@ function renderHome(){
   app.querySelectorAll(".day").forEach(b=>b.onclick=()=>{ S.day=+b.dataset.day; savePrefs(); renderHome(); });
   app.querySelectorAll("#prepOpts button").forEach(b=>b.onclick=()=>{ S.prepSecs=+b.dataset.p; savePrefs(); renderHome(); });
   app.querySelectorAll("#lvlOpts button").forEach(b=>b.onclick=()=>{ S.level=b.dataset.l; savePrefs(); renderHome(); });
+  const ro=app.querySelector("#repriseOff"); if(ro) ro.onclick=()=>{ S.reprise.left=0; savePrefs(); renderHome(); };
   app.querySelector("#cycDown").onclick=()=>{ S.cycle=Math.max(1,S.cycle-1); savePrefs(); renderHome(); };
   app.querySelector("#cycUp").onclick=()=>{ S.cycle=Math.min(9,S.cycle+1); savePrefs(); renderHome(); };
   app.querySelector("#start").onclick=()=>startSession("week");
@@ -1024,8 +1043,13 @@ function pickReview(){
 }
 function weekSteps(){
   const base=WEEKS[S.week].steps.slice(), r=pickReview();
+  if((VFE_DAYS[S.week]||[]).includes(S.day) && base[0] && base[0].t==="Échauffement express"){
+    const v=VFE.steps.map(x=>({...x}));
+    v[0].c=["🔬 Jour VFE : le protocole de Stemple remplace l’échauffement (tes chronos alimentent l’export)", ...VFE.steps[0].c];
+    base.splice(0,1,...v);
+  }
   if(r){
-    let at=0; for(let i=0;i<Math.min(3,base.length);i++) if(WARMUPS.has(base[i].t)) at=i+1;
+    let at=0; while(at<base.length && WARMUPS.has(base[at].t)) at++;
     base.splice(at,0,{t:r.t, s:75, review:true,
       c:[ r.why==="weak" ? `Rappel ciblé : ${r.n} ✗ sur cet exercice ces 7 derniers jours` : `Rappel espacé : travaillé il y a ${r.ago} semaine${r.ago>1?"s":""} — on le réactive avant l’oubli`, `2 rounds seulement, qualité maximale`],
       tip:`Revenir sur un geste après un délai l’ancre plus durablement que le répéter en bloc.`});
@@ -1045,7 +1069,7 @@ function startSession(mode){
   const src = modeSrc(mode);
   setAccent(src.accent,src.ink);
   S.steps=(mode==="week")?weekSteps():src.steps; S.running=true; S.screen="session";
-  S.idx=0; S.tr=0; S.trAuto=0; S.sessTop=null; S.vfeHolds=[]; S.rateOkN=0; S.rateKoN=0; S.koEx={}; S.singN=0; S.skipN=0; S.activeMs=0; S.lastTick=0; S.stepT0=Date.now(); S.wuOk=false; S.phases=buildPhases(S.steps[0]); S.pidx=0;
+  S.idx=0; S.tr=0; S.trAuto=0; S.sessTop=null; S.sessPeak=null; S.vfeHolds=[]; S.rateOkN=0; S.rateKoN=0; S.koEx={}; S.singN=0; S.skipN=0; S.activeMs=0; S.lastTick=0; S.stepT0=Date.now(); S.wuOk=false; S.phases=buildPhases(S.steps[0]); S.pidx=0;
   S.phase="prep"; S.prepMs=S.prepSecs*1000; S.remMs=S.phases[0].sec*1000;
   S.endAt=Date.now()+S.prepMs;
   renderSession();
@@ -1176,6 +1200,18 @@ function renderSession(){
     </div>
     <div class="sess-consigne">${isRec?`<span class="r">🎙 </span>`:""}${esc(consigne)}</div>
 
+    <div class="act-slot" id="actSlot" style="display:none">
+      <div class="rate-row idle" id="rateRow">
+        <button class="rate-btn ok" id="rateOk">✓ Propre</button>
+        <button class="rate-btn ko" id="rateKo">✗ Forcé</button>
+      </div>
+      <div class="rate-hint" id="rateHint"></div>
+      <div class="chrono-row idle" id="chronoRow">
+        <button class="chrono-btn" id="chronoBtn">⏱ Départ</button>
+        <span class="chrono-best" id="chronoBest"></span>
+      </div>
+    </div>
+
     <div class="ring-wrap">
       <div class="ring" id="ring">
         <svg viewBox="0 0 248 248">
@@ -1205,18 +1241,9 @@ function renderSession(){
       <button class="pill drone-pill" id="phaseDrone">🎵 Bourdon</button>
       <button class="pill drone-pill" id="phaseDuo">🎹 Duo</button>
     </div>
-    <div class="rate-row" id="rateRow" style="display:none">
-      <button class="rate-btn ok" id="rateOk">✓ Propre</button>
-      <button class="rate-btn ko" id="rateKo">✗ Forcé</button>
-    </div>
-    <div class="rate-hint" id="rateHint" style="display:none">Sois un juge intraitable : ✗ n’est pas un échec, c’est l’info qui règle ta difficulté. Timbre égal, zéro poussée = ✓.</div>
     <div class="rec-row" id="recRow" style="display:none">
       <button class="rec-btn" id="recBtn">⏺ M’enregistrer</button>
       <button class="rec-btn play" id="recPlay" style="display:none">▶ Moi</button>
-    </div>
-    <div class="chrono-row" id="chronoRow" style="display:none">
-      <button class="chrono-btn" id="chronoBtn">⏱ Départ</button>
-      <span class="chrono-best" id="chronoBest"></span>
     </div>
     <div class="ex-record" id="exRecord" style="display:none"></div>
 
@@ -1347,15 +1374,25 @@ function paintControls(){
   const du=document.getElementById("phaseDuo"); if(du){ du.classList.toggle("on",!!S.duo); du.style.display = S.steps[S.idx].t.startsWith("Oreille") ? "none" : "inline-flex"; }
   const rp=document.getElementById("phaseReplay"); if(rp) rp.firstChild&&(rp.textContent = ph.mode==="siren" ? "▶ Relancer" : "▶ Rejouer");
 }
+// Zone d'action en haut : visible pendant tout l'exercice (pas de saut de mise en page),
+// les boutons ne s'allument que quand ils servent (« À TOI » pour ✓/✗, tenue chronométrée pour ⏱).
+function paintSlot(){
+  const slot=document.getElementById("actSlot"); if(!slot) return;
+  const hasSing=S.phases.some(p=>p.mode==="sing"), hasChrono=S.phases.some(p=>p.chrono);
+  slot.style.display=(hasSing||hasChrono)?"block":"none";
+  const ph=curPhase(), run=S.phase==="run", singNow=run&&ph.mode==="sing";
+  const rr=document.getElementById("rateRow"), rh=document.getElementById("rateHint"), cr=document.getElementById("chronoRow");
+  if(rr){ rr.style.display=hasSing?"flex":"none"; rr.classList.toggle("idle",!singNow); }
+  if(rh){ rh.style.display=hasSing?"block":"none";
+    rh.textContent=singNow?"Note ta reproduction — au moins les 2 derniers rounds. Serré ou crié = ✗.":"Écoute d’abord : les boutons s’allument sur « À TOI »."; }
+  if(cr){ cr.style.display=hasChrono?"flex":"none"; cr.classList.toggle("idle",!(run&&ph.chrono)); }
+}
 function paintRate(){
-  const rr=document.getElementById("rateRow");
-  const showRate=(S.phase==="run" && curPhase().mode==="sing");
-  if(rr) rr.style.display = showRate ? "flex" : "none";
-  const rh=document.getElementById("rateHint"); if(rh) rh.style.display = showRate ? "block" : "none";
+  paintSlot();
   const er=document.getElementById("exRecord");
   if(er){
     const top=S.tops[S.steps[S.idx].t];
-    if(top!=null && S.phase==="run" && (curPhase().mode==="sing"||curPhase().mode==="listen")){ er.style.display="block"; er.textContent="🏔 Record validé : "+midiName(top); }
+    if(top!=null && S.phase==="run" && (curPhase().mode==="sing"||curPhase().mode==="listen")){ er.style.display="block"; er.textContent="🏔 Sommet validé : "+midiName(top+phaseSpan(curPhase())); }
     else er.style.display="none";
   }
 }
@@ -1376,13 +1413,14 @@ function shiftPhase(d){
 function totTr(){ return (S.tr||0)+(S.trAuto||0); }
 // Feedback adaptatif : ✓ propre → on continue de monter (et record) ; ✗ forcé → le round suivant REDESCEND
 function rateRound(ok){
-  const ph=curPhase(); if(ph.mode!=="sing") return;
+  const ph=curPhase(); if(S.phase!=="run"||ph.mode!=="sing") return;
   const sung=(ph.note||48)+totTr();
   const t=S.steps[S.idx].t;
   if(ok){
     S.rateOkN=(S.rateOkN||0)+1;
     if(isRangeEx(t)){
       if(S.sessTop==null||sung>S.sessTop) S.sessTop=sung;
+      const peak=sung+phaseSpan(ph); if(S.sessPeak==null||peak>S.sessPeak) S.sessPeak=peak;
       if(S.tops[t]==null||sung>S.tops[t]){ S.tops[t]=sung; saveTops(); }
     }
   } else {
@@ -1405,7 +1443,7 @@ async function logAbandon(){
 function exportPayload(){
   return JSON.stringify({
     app:"VOIX", v:1, exportedAt:new Date().toISOString(),
-    profile:{level:S.level, cycle:S.cycle, week:S.week, day:S.day, goal:S.goal},
+    profile:{level:S.level, cycle:S.cycle, week:S.week, day:S.day, goal:S.goal, reprise:S.reprise||null},
     tops:S.tops, logs:S.logs, aband:S.aband||[],
   });
 }
@@ -1457,7 +1495,7 @@ function importFilePick(ev){
 /* Chrono VFE : tap départ / tap stop — mesure la tenue maximale */
 const CH={on:false,t0:0};
 function chronoToggle(){
-  const btn=document.getElementById("chronoBtn"); if(!btn) return;
+  const btn=document.getElementById("chronoBtn"); if(!btn||!(S.phase==="run"&&curPhase().chrono)) return;
   if(!CH.on){ CH.on=true; CH.t0=performance.now(); btn.classList.add("run"); btn.textContent="⏹ 0.0 s"; }
   else{
     CH.on=false; btn.classList.remove("run");
@@ -1505,9 +1543,8 @@ function paintRec(){
   row.style.display=(S.phase==="run" && curPhase().mode==="sing")?"flex":"none";
 }
 function paintChrono(){
-  const row=document.getElementById("chronoRow"); if(!row) return;
   const show=S.phase==="run" && !!curPhase().chrono;
-  row.style.display=show?"flex":"none";
+  paintSlot();
   if(!show && CH.on){ CH.on=false; const b=document.getElementById("chronoBtn"); if(b){ b.classList.remove("run"); b.textContent="⏱ Départ"; } }
 }
 function duoFaded(j){
@@ -1560,7 +1597,7 @@ function renderEnd(){
   app.innerHTML=`
     <h1 class="done-h">Séance terminée</h1>
     <div class="done-sub">${label} · ${Math.round(dur/60)} min</div>
-    ${S.sessTop!=null?`<div class="done-top">🏔 Sommet validé aujourd’hui : <b>${midiName(S.sessTop)}</b></div>`:""}
+    ${S.sessPeak!=null?`<div class="done-top">🏔 Note la plus haute validée : <b>${midiName(S.sessPeak)}</b></div>`:""}
     ${S.vfeHolds.length?`<div class="done-top">⏱ Meilleure tenue VFE : <b>${Math.max(...S.vfeHolds).toFixed(1)} s</b></div>`:""}
     ${(S.mode==="week"&&S.week===16&&S.day===7)?`<div class="cycle-done">🎉 Cycle ${S.cycle} terminé ! <button class="pill on" id="nextCycle">Démarrer le cycle ${S.cycle+1} →</button></div>`:""}
 
@@ -1616,7 +1653,7 @@ function renderEnd(){
     const prevBest=S.logs.reduce((m,l)=>Math.max(m,l.sssss||0),0);
     S.logs.unshift({ date:todayKey(), ts:Date.now(),
       mode:S.mode, week:S.mode==="week"?S.week:null, day:S.mode==="week"?S.day:null,
-      sssss:S.form.sssss, sens:S.form.sens, note:(S.form.note||"").trim(), top:S.sessTop??null, vfeBest:(S.vfeHolds.length?Math.max(...S.vfeHolds):null), vfeAvg:(S.vfeHolds.length?Math.round(10*S.vfeHolds.reduce((a,b)=>a+b,0)/S.vfeHolds.length)/10:null),
+      sssss:S.form.sssss, sens:S.form.sens, note:(S.form.note||"").trim(), top:S.sessTop??null, peak:S.sessPeak??null, vfeBest:(S.vfeHolds.length?Math.max(...S.vfeHolds):null), vfeAvg:(S.vfeHolds.length?Math.round(10*S.vfeHolds.reduce((a,b)=>a+b,0)/S.vfeHolds.length)/10:null),
       rateOk:S.rateOkN||0, rateKo:S.rateKoN||0, koEx:(S.koEx&&Object.keys(S.koEx).length?S.koEx:null),
       min:Math.round((S.activeMs||0)/60000), sings:S.singN||0, skips:S.skipN||0, ssM:!!S.form.ssM });
     if(S.logs.length>400) S.logs.length=400;
@@ -1624,6 +1661,7 @@ function renderEnd(){
     const record = prevBest>0 && v>prevBest;
     const goalHit = v>=S.goal;
     S._celebrate = (record||goalHit) ? {record, goal:goalHit, value:v} : null;
+    if(repriseOn()){ S.reprise.left--; savePrefs(); }
     await Store.setJSON(K_LOGS,S.logs);
   }
   app.querySelector("#save").onclick=async(e)=>{ e.target.disabled=true; await doSave(); renderProgress(); };
@@ -1677,8 +1715,8 @@ function renderProgress(){
   const chrono=[...logs].reverse(); // ancien -> récent
   const ssVals=chrono.map(l=>l.sssss);
   const senVals=chrono.map(l=>l.sens);
-  const topLogs=chrono.filter(l=>l.top!=null);
-  const topVals=topLogs.map(l=>l.top);
+  const topLogs=chrono.filter(l=>(l.peak??l.top)!=null);
+  const topVals=topLogs.map(l=>l.peak??l.top);
   const bestTop=topVals.length?Math.max(...topVals):null;
   const vfeVals=chrono.filter(l=>l.vfeBest!=null).map(l=>l.vfeBest);
   const bestVfe=vfeVals.length?Math.max(...vfeVals):null;
@@ -1719,7 +1757,8 @@ function renderProgress(){
     </div>
 
     <div class="card chart-card">
-      <h3>Tessiture validée — sommet « propre » par séance</h3>
+      <h3>Tessiture validée — note la plus haute « propre » par séance</h3>
+      ${chrono.some(l=>l.peak!=null)?`<div class="vfe-line">Mesure affinée : les séances récentes comptent la note la plus haute réellement chantée (avant : note de départ du round) — le saut de la courbe n’est pas un progrès.</div>`:""}
       ${topVals.length?lineChart(topVals,"#5fd08a"):`<div class="empty">Valide tes rounds avec ✓ Propre pendant les vocalises : ton sommet réel apparaîtra ici, séance après séance.</div>`}
       ${bestVfe!=null?`<div class="vfe-line">⏱ Record VFE (tenue max) : <b>${bestVfe.toFixed(1)} s</b></div>`:""}
     </div>
@@ -2019,8 +2058,21 @@ const PATTERNS={
 // ---- SYSTÈME DE PHASES : appel-réponse (écoute → à toi) + sous-étapes + sirènes guidées ----
 // Niveau : "std" (confirmé) / "adv" (avancé : plus haut, plus de répétitions, plus rapide)
 function wkBoost(){ const w=WEEKS[S.week]; return (S.mode==="week"&&w&&w.boost)?w.boost:{r:0,t:0}; }
-function lvRoot(){ return (S.level==="adv"?2:0) + Math.min(S.cycle-1,4) + wkBoost().r; }
-function lvRounds(){ return S.level==="adv"?2:0; }
+function lvRoot(){ return (S.level==="adv"?2:0) + Math.min(S.cycle-1,4) + wkBoost().r + (repriseOn()?-2:0); }
+function lvRounds(){ return (S.level==="adv"?2:0) + (repriseOn()?-2:0); }
+function phaseSpan(ph){ if(!ph||!ph.play||ph.sustain||ph.play.art==="sustain") return 0; const q=ph.play.seq||PATTERNS[ph.play.pat]||[0]; return Math.max(0,...q); }
+function repriseOn(){ return !!(S.reprise && S.reprise.left>0); }
+// Pause ≥ 7 jours → 3 séances allégées (−2 demi-tons, −2 rounds). Si la 1re séance de reprise est déjà faite, il en reste 2.
+function checkReprise(){
+  const L=S.logs||[]; if(!L.length) return;
+  const D=864e5, today=new Date(todayKey()).getTime(), last=new Date(L[0].date).getTime();
+  const gapNow=Math.round((today-last)/D);
+  if(gapNow>=7){ if(!S.reprise||S.reprise.since!==L[0].ts){ S.reprise={left:3,since:L[0].ts}; savePrefs(); } return; }
+  if(L.length>=2){
+    const gapPrev=Math.round((last-new Date(L[1].date).getTime())/D);
+    if(gapPrev>=7 && gapNow<=3 && (!S.reprise||S.reprise.since!==L[1].ts)){ S.reprise={left:2,since:L[1].ts}; savePrefs(); }
+  }
+}
 function lvTempo(){ return (S.level==="adv"?1.1:1) * (1+.03*Math.min(S.cycle-1,4)) * (1+.01*Math.max(0,wkBoost().t)); }
 function patDur(patName, tempo){
   const pat=PATTERNS[patName]||[0]; const beat=60/(tempo||90);
@@ -2198,7 +2250,7 @@ const SPEC={
 // pour que le DERNIER round vise record+1 (surcharge progressive), borné autour de la base.
 function adaptRoot(title, base, rounds){
   const top=S.tops[title]; if(top==null) return base;
-  const start=top+2-rounds;
+  const start=top+(repriseOn()?0:2)-rounds; // reprise : le dernier round vise record−1 au lieu de record+1
   return Math.max(base-3, Math.min(base+10, start));
 }
 // Récupération physiologique après les exercices les plus coûteux
@@ -2691,7 +2743,7 @@ function celebrateSound(){
 /* =========================================================
    PERSISTANCE position + prefs
    ========================================================= */
-async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal,level:S.level,cycle:S.cycle,duo:!!S.duo,boost:S.boost||1}); }
+async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.week,day:S.day,prepSecs:S.prepSecs,goal:S.goal,level:S.level,cycle:S.cycle,duo:!!S.duo,boost:S.boost||1,reprise:S.reprise||null}); }
 
 /* =========================================================
    BOOT
@@ -2708,6 +2760,7 @@ async function savePrefs(){ await Store.setJSON(K_PREFS,{muted:S.muted,week:S.we
     if(Number.isInteger(prefs.cycle)&&prefs.cycle>=1&&prefs.cycle<=9) S.cycle=prefs.cycle;
     if(typeof prefs.duo==="boolean") S.duo=prefs.duo;
     if([1,1.5,2,3].includes(prefs.boost)) S.boost=prefs.boost;
+    if(prefs.reprise&&Number.isInteger(prefs.reprise.left)) S.reprise=prefs.reprise;
   }
   S.tops=await Store.getJSON(K_TOPS,{}) || {};
   S.aband=await Store.getJSON(K_AB,[]) || [];
